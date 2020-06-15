@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com.MobileSolutions.WebPdfReader", "Com.MobileSolutions.WebPdfReader\Com.MobileSolutions.WebPdfReader.csproj", "{8143EC4C-A810-4BDB-A819-9741EAB28BCC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Presentation", "1-Presentation", "{0A7F70E2-28DF-4F10-AA95-C3E9F2CCE0C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Application", "2-Application", "{336BF951-A8B7-4BD6-9039-C453020E1BC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com.MobileSolutions.Application", "Com.MobileSolutions.Application\Com.MobileSolutions.Application.csproj", "{4F5CBA20-C336-412E-9F38-1499E31927D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Domain", "3-Domain", "{E196752B-58D1-4358-846F-E0B821159118}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com.MobileSolutions.Domain", "Com.MobileSolutions.Domain\Com.MobileSolutions.Domain.csproj", "{F19B2538-63CE-41BD-A130-78A572FCD92B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com.MobileSolutions.VerizonWirelessReader", "Com.MobileSolutions.VerizonWirelessReader\Com.MobileSolutions.VerizonWirelessReader.csproj", "{4DFCFB85-A61D-4632-91A3-7FE23E3EA911}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8143EC4C-A810-4BDB-A819-9741EAB28BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8143EC4C-A810-4BDB-A819-9741EAB28BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8143EC4C-A810-4BDB-A819-9741EAB28BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8143EC4C-A810-4BDB-A819-9741EAB28BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5CBA20-C336-412E-9F38-1499E31927D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5CBA20-C336-412E-9F38-1499E31927D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5CBA20-C336-412E-9F38-1499E31927D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5CBA20-C336-412E-9F38-1499E31927D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F19B2538-63CE-41BD-A130-78A572FCD92B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F19B2538-63CE-41BD-A130-78A572FCD92B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F19B2538-63CE-41BD-A130-78A572FCD92B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F19B2538-63CE-41BD-A130-78A572FCD92B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DFCFB85-A61D-4632-91A3-7FE23E3EA911}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DFCFB85-A61D-4632-91A3-7FE23E3EA911}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DFCFB85-A61D-4632-91A3-7FE23E3EA911}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DFCFB85-A61D-4632-91A3-7FE23E3EA911}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8143EC4C-A810-4BDB-A819-9741EAB28BCC} = {0A7F70E2-28DF-4F10-AA95-C3E9F2CCE0C4}
+		{4F5CBA20-C336-412E-9F38-1499E31927D8} = {336BF951-A8B7-4BD6-9039-C453020E1BC5}
+		{F19B2538-63CE-41BD-A130-78A572FCD92B} = {E196752B-58D1-4358-846F-E0B821159118}
+		{4DFCFB85-A61D-4632-91A3-7FE23E3EA911} = {336BF951-A8B7-4BD6-9039-C453020E1BC5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4EE603E9-7211-45DC-B435-41E15AB8C387}
+	EndGlobalSection
+EndGlobal

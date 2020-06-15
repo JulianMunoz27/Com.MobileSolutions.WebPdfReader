@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetZip" Version="1.13.7" />
+    <PackageReference Include="Spire.PDF" Version="6.4.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Com.MobileSolutions.Application\Com.MobileSolutions.Application.csproj" />
+  </ItemGroup>
+
+</Project>
