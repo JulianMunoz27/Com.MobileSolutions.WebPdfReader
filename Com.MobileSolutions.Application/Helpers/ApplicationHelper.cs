@@ -90,13 +90,34 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
-            //var text = pages[1023].ExtractText().Remove(0, 70);
+            //var text = pages[18014].ExtractText().Remove(0, 70);
+            //var splittedPage = text.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+            //foreach (var item in splittedPage)
+            //{
+            //    var len = item.Length;
+            //    if (len > 57)
+            //    {
+            //        var foo = item.Insert(57, "%@");
+            //        pageList.Add(foo);
+            //    }
+            //}
+
+            //var texts = string.Join("\r\n", pageList.ToArray());
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
+            //text = text.Substring(0, 57);
             //pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 11));
+            //var text2 = pages[18015].ExtractText().Remove(0, 70);
+            //RegexOptions options2 = RegexOptions.None;
+            //Regex regex2 = new Regex("[ ]{2,}", options2);
+            //text2 = regex2.Replace(text, "|");
+            //text2 = text2.Substring(0, 57);
+            //pageList.Add(text2);
+
+            //detailList.Add(DetailPageReader(document, 18015));
+            //detailList.Add(DetailPageReader(document, 18016));
 
             foreach (var page in pageList)
             {
