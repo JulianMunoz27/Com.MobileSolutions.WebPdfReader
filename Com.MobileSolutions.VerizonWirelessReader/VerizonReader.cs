@@ -899,7 +899,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 while (!finalValueRegex.IsMatch(detailArray[values + 1].Split(Constants.Pipe)[detailArray[values + 1].Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
 
-                                    var surValues = helper.w(detailArray[values + 1], accountNumber, mrcDataSpName, serviceId);
+                                    var surValues = helper.GetTaxesGovermentalSurcharges(detailArray[values + 1], accountNumber, mrcDataSpName, serviceId);
 
                                     if (surValues != null)
                                     {
