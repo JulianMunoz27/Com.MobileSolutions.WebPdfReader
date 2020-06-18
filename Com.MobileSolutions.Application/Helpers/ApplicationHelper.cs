@@ -92,17 +92,23 @@ namespace Com.MobileSolutions.Application.Helpers
 
             //var text = pages[18014].ExtractText().Remove(0, 70);
             //var splittedPage = text.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-            //foreach (var item in splittedPage)
+            //for (var i = 0; i <= splittedPage.Count - 1; i++)
             //{
-            //    var len = item.Length;
-            //    if (len > 57)
+            //    var len = splittedPage[i].Length;
+            //    if (len > 57 && i >= 4)
             //    {
-            //        var foo = item.Insert(57, "%@");
-            //        pageList.Add(foo);
+            //        var regexTest = new Regex(@".*(?=%@)");
+            //        var foo = regexTest.Match(splittedPage[i].Insert(57, "%@"));
+            //        var foo2 = !string.IsNullOrEmpty(foo.Value) ? splittedPage[i].Insert(57, "%@").Replace(foo.Value, "") : splittedPage[i].Insert(57, "%@");
+            //        pageList.Add(foo2);
+            //    }
+            //    else
+            //    {
+            //        pageList.Add(splittedPage[i]);
             //    }
             //}
 
-            //var texts = string.Join("\r\n", pageList.ToArray());
+            //var texts = string.Join("\r\n", pageList.ToArray());            
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
@@ -235,6 +241,26 @@ namespace Com.MobileSolutions.Application.Helpers
             {
                 page = document.Pages[pageNumber - 1].ExtractText().Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
             }
+
+            //foreach (var line in page)
+            //{
+
+            //    var len = line.Length;
+            //    if (len > 57 && lineCount >= 4)
+            //    {
+            //        var lineWithChars = line.Insert(57, "%@");
+            //        RegexOptions options = RegexOptions.None;
+            //        Regex regex = new Regex("[ ]{2,}", options);
+            //        formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
+            //    }
+            //    else
+            //    {
+            //        RegexOptions options = RegexOptions.None;
+            //        Regex regex = new Regex("[ ]{2,}", options);
+            //        formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+            //    }
+            //    lineCount++;
+            //}
 
             foreach (var line in page)
             {
