@@ -96,7 +96,7 @@ namespace Com.MobileSolutions.Application.Helpers
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 11));
+            //detailList.Add(DetailPageReader(document, 59));
 
             foreach (var page in pageList)
             {
@@ -237,7 +237,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -302,7 +302,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -370,7 +370,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -437,7 +437,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -501,7 +501,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -568,7 +568,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -652,7 +652,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -718,7 +718,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -789,7 +789,7 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -848,7 +848,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -926,12 +926,10 @@ namespace Com.MobileSolutions.Application.Helpers
                                 }
                                 else
                                 {
-
                                     var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
 
                                     if (internationalVoiceRegex.Success)
                                     {
-
                                         var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
 
                                         usgsumData.UNIQ_ID = Constants.USGSUM;
@@ -975,6 +973,27 @@ namespace Com.MobileSolutions.Application.Helpers
 
             }
             return detailList;
+        }
+
+        public List<string> getPageContent(int page)
+        {
+            List<string> formattedPage = new List<string>();
+
+            if(page < document.Pages.Count)
+            {
+                string pageText;
+                pageText = document.Pages[page].ExtractText();
+                
+                var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                foreach (var line in nextPage)
+                {
+                    RegexOptions options = RegexOptions.None;
+                    Regex regex = new Regex("[ ]{2,}", options);
+                    formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+                }
+            }
+            return formattedPage;
         }
 
         public DetailDto GetTaxesGovermentalSurcharges(string surValues, string accountNumber, string mrcDataSpName, string serviceId)

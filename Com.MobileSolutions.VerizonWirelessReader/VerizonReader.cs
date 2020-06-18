@@ -29,6 +29,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
         private decimal lineTotal = System.Convert.ToDecimal(0.0);
         private decimal reconciliationValue = 0;
         private string acctType = string.Empty;
+        private PdfDocument document;
 
         /// <summary>
         /// Verizon Reader class constructor.
@@ -36,6 +37,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
         public VerizonReader(PdfDocument document, string path)
         {
             helper = new ApplicationHelper(document, path);
+            this.document = document;
         }
 
 
@@ -346,7 +348,6 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     var totalCurrentChargesFor = detail.FirstOrDefault(d => d.Contains(Constants.TotalCurrentChargesFor));
                     var totalUsagePurchaseCharges = detail.FirstOrDefault(d => d.Contains(Constants.TotalUsagePurchaseCharges));
 
-
                     var summaryRegex = new Regex(Constants.SummaryRegex).Match(spNameChecker);
 
                     var summaryGroup = summaryRegex.Groups;
@@ -406,6 +407,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     }
                     else
                     {
+                        var pageRegex = new Regex(Constants.pageRegex);
+                        var pageValidation = pageRegex.Match(detailArray[1]);
+                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
+
                         List<DetailDto> temp = adjAccountResult.FindAll(b => b.SUBSCRIBER.Equals(serviceId.Replace("-", string.Empty)));
 
                         foreach (DetailDto element in temp)
@@ -416,241 +421,414 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             adjAccountResult.Remove(element);
                         }
 
-                        //*************************************************************************************************************************
-                        //***************************************** Your Plan|Monthly Charges *****************************************************
-                        //*************************************************************************************************************************
-
-                        if (!string.IsNullOrEmpty(yourPlanMonthlyFind))
+                        var pageContent = detail;
+                        do
                         {
-                            var firstOcc = detail.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
-                            var occPosArray = Array.IndexOf(detailArray, firstOcc);
+                            detailArray = pageContent.ToArray();
+                            totalCurrentChargesFor = pageContent.FirstOrDefault(d => d.Contains(Constants.TotalCurrentChargesFor));
+                            yourPlanMonthlyFind = pageContent.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
 
-                            var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
+                            //*************************************************************************************************************************
+                            //***************************************** Your Plan|Monthly Charges *****************************************************
+                            //*************************************************************************************************************************
 
-
-                            while (!finalValueRegex.IsMatch(detailArray[occPosArray + 1].Split(Constants.Pipe)[detailArray[occPosArray + 1].Split(Constants.Pipe).Length - 1]))
-                            {//Total Voice
-                                var mrcValues = detailArray[occPosArray + 1];
-                                DetailDto usgsumDetail = new DetailDto();
-
-
-                                var monthlyChargesRegex = new Regex(Constants.MonthlyChargesRegex);
-
-                                if (monthlyChargesRegex.IsMatch(mrcValues))
-                                {
-
-                                    var voiceGroup = monthlyChargesRegex.Match(mrcValues).Groups;
-
-                                    var date = mrcValues.Split(Constants.Pipe).Length == 3 ? mrcValues.Split(Constants.Pipe)[1] : mrcValues.Split(Constants.Pipe)[2];
-
-                                    DetailDto mrcData = new DetailDto();
-
-                                    if (planName.Equals(string.Empty))
-                                    {
-                                        planName = voiceGroup[3].ToString();
-                                    }
-
-                                    var begYear = Convert.ToInt32(voiceGroup[4].ToString()) >= 1 && Convert.ToInt32(voiceGroup[4].ToString()) <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
-
-                                    var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[6].ToString()), this.dateDueMonth, this.dateDueYear);
-
-                                    mrcData.UNIQ_ID = Constants.MRC;
-                                    mrcData.CHG_CLASS = Constants.LevelOne;
-                                    mrcData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                                    mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                    mrcData.SP_NAME = mrcDataSpName.TrimStart();
-                                    mrcData.SUBSCRIBER = serviceId;
-                                    mrcData.CHG_CODE_1 = voiceGroup[3].ToString();
-                                    mrcData.CHG_CODE_2 = planName;
-                                    mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[5].ToString())).ToString("M/d/yyyy");
-                                    mrcData.END_CHG_DATE = new DateTime(endYear, Convert.ToInt32(voiceGroup[6].ToString()), Convert.ToInt32(voiceGroup[7].ToString())).ToString("M/d/yyyy");
-                                    mrcData.CHG_AMT = Utils.NumberFormat(voiceGroup[8].ToString());
-                                    mrcData.CURRENCY = Constants.USD;
-                                    mrcData.INFO_ONLY_IND = "N";
-                                    mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
-
-                                    this.lineTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
-
-                                    result.Add(mrcData);
-                                }
-
-                                occPosArray++;
-                            }
-                        }
-
-                        //***************************************************************************************************************************
-                        //************************************************** EquipmentCharges *******************************************************
-                        //***************************************************************************************************************************
-
-                        if (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges))))
-                        {
-                            var firstOcc = detail.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges));
-                            var occStartPosArray = Array.IndexOf(detailArray, firstOcc);
-
-
-                            while (!moneyRegex.IsMatch(detailArray[occStartPosArray + 1].Split(Constants.Pipe)[detailArray[occStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                            if (!string.IsNullOrEmpty(yourPlanMonthlyFind))
                             {
-                                DetailDto equipment = this.GetEquipmentCharges(detailArray[occStartPosArray + 1], mrcDataSpName, serviceId);
+                                var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
+                                var occPosArray = Array.IndexOf(detailArray, firstOcc);
 
-                                if (equipment != null)
-                                    occResult.Add(equipment);
-
-                                occStartPosArray++;
-                            }
-                        }
-
-                        //***************************************************************************************************************************
-                        //********************************************** Usage and Purchase Charges**************************************************
-                        //***************************************************************************************************************************
-                        if (!string.IsNullOrEmpty(usagePurchesFind))
-                        {
-
-                            //***************************************************************************************************************************
-                            //********************************************************* Voice ***********************************************************
-                            //***************************************************************************************************************************
-                            var voiceFind = detail.FirstOrDefault(d => d.Contains(Constants.VoiceTitle));
-                            if (!string.IsNullOrEmpty(voiceFind))
-                            {
-                                var firstdetail = detail.FirstOrDefault(d => d.Contains(Constants.VoiceTitle));
-                                var detailPosArray = Array.IndexOf(detailArray, firstdetail);
+                                var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
 
 
-                                while (!detailArray[detailPosArray + 1].Contains(Constants.TotalVoice))
+                                while (!finalValueRegex.IsMatch(detailArray[occPosArray + 1].Split(Constants.Pipe)[detailArray[occPosArray + 1].Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
+                                    var mrcValues = detailArray[occPosArray + 1];
+                                    DetailDto usgsumDetail = new DetailDto();
 
-                                    var shared = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
 
+                                    var monthlyChargesRegex = new Regex(Constants.MonthlyChargesRegex);
 
-                                    DetailDto voiceTemp = helper.GetVoice(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, this.accountNumber, shared);
-
-                                    if (voiceTemp != null)
+                                    if (monthlyChargesRegex.IsMatch(mrcValues))
                                     {
-                                        this.lineTotal += System.Convert.ToDecimal(voiceTemp.CHG_AMT);
-                                        usgsumResult.Add(voiceTemp);
-                                    }
 
-                                    lock (this)
-                                    {
-                                        if (detailPosArray + 1 == detailArray.Length - 1)
+                                        var voiceGroup = monthlyChargesRegex.Match(mrcValues).Groups;
+
+                                        var date = mrcValues.Split(Constants.Pipe).Length == 3 ? mrcValues.Split(Constants.Pipe)[1] : mrcValues.Split(Constants.Pipe)[2];
+
+                                        DetailDto mrcData = new DetailDto();
+
+                                        if (planName.Equals(string.Empty))
                                         {
-                                            // search for other pages
-                                            var pageRegex = new Regex(Constants.pageRegex);
-                                            var pageValidation = pageRegex.Match(detailArray[1]);
-                                            var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                            var nextPageList = helper.NextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                            nextPageList.ForEach(val => usgsumResult.Add(val));
-
-
-                                            break;
+                                            planName = voiceGroup[3].ToString();
                                         }
-                                        detailPosArray++;
+
+                                        var begYear = Convert.ToInt32(voiceGroup[4].ToString()) >= 1 && Convert.ToInt32(voiceGroup[4].ToString()) <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+
+                                        var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[6].ToString()), this.dateDueMonth, this.dateDueYear);
+
+                                        mrcData.UNIQ_ID = Constants.MRC;
+                                        mrcData.CHG_CLASS = Constants.LevelOne;
+                                        mrcData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                        mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                        mrcData.SP_NAME = mrcDataSpName.TrimStart();
+                                        mrcData.SUBSCRIBER = serviceId;
+                                        mrcData.CHG_CODE_1 = voiceGroup[3].ToString();
+                                        mrcData.CHG_CODE_2 = planName;
+                                        mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[5].ToString())).ToString("M/d/yyyy");
+                                        mrcData.END_CHG_DATE = new DateTime(endYear, Convert.ToInt32(voiceGroup[6].ToString()), Convert.ToInt32(voiceGroup[7].ToString())).ToString("M/d/yyyy");
+                                        mrcData.CHG_AMT = Utils.NumberFormat(voiceGroup[8].ToString());
+                                        mrcData.CURRENCY = Constants.USD;
+                                        mrcData.INFO_ONLY_IND = "N";
+                                        mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
+
+                                        this.lineTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
+
+                                        result.Add(mrcData);
                                     }
+
+                                    occPosArray++;
                                 }
                             }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(voiceFind))
-                            {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
 
-                                lock (this)
+
+                            //***************************************************************************************************************************
+                            //************************************************** EquipmentCharges *******************************************************
+                            //***************************************************************************************************************************
+
+                            if (!string.IsNullOrEmpty(pageContent.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges))))
+                            {
+                                var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges));
+                                var occStartPosArray = Array.IndexOf(detailArray, firstOcc);
+
+
+                                while (!moneyRegex.IsMatch(detailArray[occStartPosArray + 1].Split(Constants.Pipe)[detailArray[occStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
                                 {
-                                    var nextPageList = helper.NextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
+                                    DetailDto equipment = this.GetEquipmentCharges(detailArray[occStartPosArray + 1], mrcDataSpName, serviceId);
 
+                                    if (equipment != null)
+                                        occResult.Add(equipment);
 
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                        usgsumResult.Add(element);
-                                    }
+                                    occStartPosArray++;
                                 }
                             }
 
-                            //***************************************************************************************************************************
-                            //************************************************** Messaging section ******************************************************
-                            //***************************************************************************************************************************
 
-
-                            var messageFind = detail.FirstOrDefault(d => d.Contains(Constants.MessagingTitle));
-                            if (!string.IsNullOrEmpty(messageFind))
+                            //***************************************************************************************************************************
+                            //********************************************** Usage and Purchase Charges**************************************************
+                            //***************************************************************************************************************************
+                            if (!string.IsNullOrEmpty(usagePurchesFind))
                             {
 
-                                var detailPosArray = Array.IndexOf(detailArray, messageFind);
-
-                                int values = detailPosArray;
-
-                                while (!detailArray[values + 1].Contains(Constants.TotalMessaging))
-                                {//Total Voice
-
-
-                                    var messagingValues = helper.GetMessaging(detailArray[values + 1], mrcDataSpName, serviceId, accountNumber, Constants.MESSAGING);
-
-                                    if (messagingValues != null)
-                                    {
-                                        usgsumResult.Add(messagingValues);
-                                        this.lineTotal += System.Convert.ToDecimal(messagingValues.CHG_AMT);
-                                    }
+                                //***************************************************************************************************************************
+                                //********************************************************* Voice ***********************************************************
+                                //***************************************************************************************************************************
+                                var voiceFind = pageContent.FirstOrDefault(d => d.Contains(Constants.VoiceTitle));
+                                if (!string.IsNullOrEmpty(voiceFind))
+                                {
+                                    var firstdetail = pageContent.FirstOrDefault(d => d.Contains(Constants.VoiceTitle));
+                                    var detailPosArray = Array.IndexOf(detailArray, firstdetail);
 
 
-                                    if (values + 1 == detailArray.Length - 1)
-                                    {
-                                        // search for other pages
-                                        var pageRegex = new Regex(Constants.pageRegex);
-                                        var pageValidation = pageRegex.Match(detailArray[1]);
-                                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
+                                    while (!detailArray[detailPosArray + 1].Contains(Constants.TotalVoice))
+                                    {//Total Voice
+
+                                        var shared = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
+
+
+                                        DetailDto voiceTemp = helper.GetVoice(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, this.accountNumber, shared);
+
+                                        if (voiceTemp != null)
+                                        {
+                                            this.lineTotal += System.Convert.ToDecimal(voiceTemp.CHG_AMT);
+                                            usgsumResult.Add(voiceTemp);
+                                        }
 
                                         lock (this)
                                         {
-                                            var nextPageList = helper.MessagingNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.MESSAGING, this.accountNumber);
-
-                                            foreach (DetailDto element in nextPageList)
+                                            if (detailPosArray + 1 == detailArray.Length - 1)
                                             {
-                                                this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                                usgsumResult.Add(element);
+
+                                                break;
+                                            }
+                                            detailPosArray++;
+                                        }
+                                    }
+                                }
+
+                                //***************************************************************************************************************************
+                                //************************************************** Messaging section ******************************************************
+                                //***************************************************************************************************************************
+
+
+                                var messageFind = pageContent.FirstOrDefault(d => d.Contains(Constants.MessagingTitle));
+                                if (!string.IsNullOrEmpty(messageFind))
+                                {
+
+                                    var detailPosArray = Array.IndexOf(detailArray, messageFind);
+
+                                    int values = detailPosArray;
+
+                                    while (!detailArray[values + 1].Contains(Constants.TotalMessaging))
+                                    {//Total Voice
+
+
+                                        var messagingValues = helper.GetMessaging(detailArray[values + 1], mrcDataSpName, serviceId, accountNumber, Constants.MESSAGING);
+
+                                        if (messagingValues != null)
+                                        {
+                                            usgsumResult.Add(messagingValues);
+                                            this.lineTotal += System.Convert.ToDecimal(messagingValues.CHG_AMT);
+                                        }
+
+
+                                        if (values + 1 == detailArray.Length - 1)
+                                        {
+
+                                            break;
+                                        }
+
+                                        values++;
+                                    }
+                                }
+
+                                //***************************************************************************************************************************************************************************
+                                //*************************************************************** Data Usage ************************************************************************************************
+                                //***************************************************************************************************************************************************************************
+
+                                var dataFind = pageContent.FirstOrDefault(d => d.Contains(Constants.DataTitle));
+                                if (!string.IsNullOrEmpty(dataFind))
+                                {
+                                    var firstData = pageContent.FirstOrDefault(d => d.Contains(Constants.DataTitle));
+                                    var dataStartPosArray = Array.IndexOf(detailArray, firstData);
+
+
+                                    while (!detailArray[dataStartPosArray + 1].Contains(Constants.TotalData))
+                                    {//Total Voice
+
+                                        var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
+                                        var usgsumDetail = helper.GetData(detailArray[dataStartPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber, Constants.DATA);
+
+
+                                        if (usgsumDetail != null)
+                                        {
+                                            usgsumResult.Add(usgsumDetail);
+                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                        }
+
+
+
+                                        if (dataStartPosArray + 1 == detailArray.Length - 1)
+                                        {
+                                            
+                                            break;
+                                        }
+                                        dataStartPosArray++;
+                                    }
+                                }
+
+                                //***************************************************************************************************************************************************************************
+                                //************************************************************************Purchases******************************************************************************************
+                                //***************************************************************************************************************************************************************************
+                                var purchasesTitle = pageContent.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle));
+                                if (!string.IsNullOrEmpty(purchasesTitle) || !string.IsNullOrEmpty(pageContent.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle2))))
+                                {
+                                    var firstdetail = !string.IsNullOrEmpty(purchasesTitle) ? purchasesTitle : pageContent.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle2));
+
+                                    var detailPosArray = Array.IndexOf(detailArray, firstdetail);
+
+                                    //while (!detailArray[detailPosArray + 1].Contains(Constants.TotalPurchases))
+                                    while (!finalValueRegex.IsMatch(detailArray[detailPosArray + 1].Split(Constants.Pipe)[detailArray[detailPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                                    {
+
+
+                                        var detailValues = helper.GetPurchases(detailArray[detailPosArray + 1], this.accountNumber, mrcDataSpName, serviceId, dateDueMonth, dateDueYear);
+
+                                        if (detailValues != null)
+                                        {
+                                            occResult.Add(detailValues);
+                                            this.lineTotal += System.Convert.ToDecimal(detailValues.CHG_AMT);
+                                        }
+
+                                        if (detailPosArray + 1 == detailArray.Length - 1)
+                                        {
+                                            
+                                            break;
+                                        }
+
+                                        detailPosArray++;
+                                    }
+                                }
+
+
+
+                                //***************************************************************************************************************************
+                                //************************************************** Roaming ****************************************************************
+                                //***************************************************************************************************************************
+
+
+                                var roamingFind = pageContent.FirstOrDefault(d => d.Contains(Constants.RoamingTitle));
+                                if (!string.IsNullOrEmpty(roamingFind))
+                                {
+
+                                    var detailPosArray = Array.IndexOf(detailArray, roamingFind);
+
+
+                                    while (!detailArray[detailPosArray + 1].Contains(Constants.TotalRoaming))
+                                    {//Total Voice
+
+                                        //var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
+                                        var share = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
+
+                                        DetailDto usgsumDetail = helper.GetRoaming(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber);
+
+                                        if (usgsumDetail != null)
+                                        {
+                                            usgsumResult.Add(usgsumDetail);
+                                            this.lineTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
+                                        }
+
+
+                                        if (detailPosArray + 1 == detailArray.Length - 1)
+                                        {
+                                            break;
+                                        }
+
+                                        detailPosArray++;
+                                    }
+                                }
+
+
+
+                                //***************************************************************************************************************************************************************************
+                                //****************************************************************International Section**************************************************************************************
+                                //***************************************************************************************************************************************************************************
+
+                                if (!string.IsNullOrEmpty(pageContent.FirstOrDefault(d => d.Contains(Constants.InternationTitle))))
+                                {
+                                    var firstdetail = pageContent.FirstOrDefault(d => d.Contains(Constants.InternationTitle));
+                                    var detailPosArray = Array.IndexOf(detailArray, firstdetail);
+
+                                    while (!detailArray[detailPosArray + 1].Contains(Constants.TotaInternational))
+                                    {//Total Voice
+
+
+                                        var detailValues = detailArray[detailPosArray + 1];
+                                        DetailDto usgsumData = new DetailDto();
+
+
+                                        if (new Regex(Constants.InternationalMessageRegex).IsMatch(detailValues))
+                                        {
+
+                                            var messagingValuesInter = helper.GetMessaging(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
+
+                                            if (messagingValuesInter != null)
+                                            {
+                                                usgsumResult.Add(messagingValuesInter);
+                                                this.lineTotal += System.Convert.ToDecimal(messagingValuesInter.CHG_AMT);
                                             }
                                         }
-                                        break;
+                                        else
+                                        {
+                                            if (new Regex(Constants.InternationDataRegex).IsMatch(detailValues))
+                                            {
+
+                                                var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
+
+
+                                                if (usgsumDetail != null)
+                                                {
+                                                    usgsumResult.Add(usgsumDetail);
+                                                    this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                var internationMinutesRegex = new Regex(Constants.InternationalMinutesRegex).Match(detailValues);
+
+                                                if (internationMinutesRegex.Success)
+                                                {
+
+                                                    var internationMinutesRegexGroup = internationMinutesRegex.Groups;
+
+                                                    usgsumData.UNIQ_ID = Constants.USGSUM;
+                                                    usgsumData.CHG_CLASS = Constants.LevelOne;
+                                                    usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                                    usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                                    usgsumData.SP_NAME = mrcDataSpName.TrimStart();
+                                                    usgsumData.SUBSCRIBER = serviceId;
+
+                                                    usgsumData.CHG_CODE_1 = internationMinutesRegexGroup[1].ToString().Replace(Constants.Pipe, ' ');
+                                                    usgsumData.CHG_QTY1_ALLOWED = internationMinutesRegexGroup[3].ToString().Contains("unlimited") ? "" : internationMinutesRegexGroup[5].ToString();
+                                                    usgsumData.CHG_QTY1_TYPE = Utils.GetChargesType(internationMinutesRegexGroup[2].ToString());
+                                                    usgsumData.CHG_QTY1_USED = internationMinutesRegexGroup[6].ToString().Replace(Constants.Hyphen, string.Empty);
+                                                    usgsumData.CHG_QTY1_BILLED = internationMinutesRegexGroup[7].ToString().Replace(Constants.Hyphen, string.Empty).Equals(string.Empty) ? "0" : internationMinutesRegexGroup[7].ToString();
+                                                    usgsumData.CHG_AMT = Utils.NumberFormat(internationMinutesRegexGroup[8].ToString().Replace(Constants.Hyphen, string.Empty).Replace(Constants.MoneySign, string.Empty));
+
+                                                    usgsumData.CURRENCY = Constants.USD;
+                                                    usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
+
+                                                    usgsumResult.Add(usgsumData);
+
+                                                    this.lineTotal += !string.IsNullOrEmpty(usgsumData.CHG_AMT) ? System.Convert.ToDecimal(usgsumData.CHG_AMT) : 0;
+                                                }
+                                                else
+                                                {
+
+                                                    var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
+
+                                                    if (internationalVoiceRegex.Success)
+                                                    {
+
+                                                        var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
+
+                                                        usgsumData.UNIQ_ID = Constants.USGSUM;
+                                                        usgsumData.CHG_CLASS = Constants.LevelOne;
+                                                        usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                                        usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                                        usgsumData.SP_NAME = mrcDataSpName.TrimStart();
+                                                        usgsumData.SUBSCRIBER = serviceId;
+                                                        usgsumData.CHG_CODE_1 = internationalVoiceRegexGroup[2].ToString().Replace(Constants.Pipe, ' ');
+
+                                                        usgsumData.CHG_AMT = Utils.NumberFormat(internationalVoiceRegexGroup[3].ToString().Replace(Constants.MoneySign, string.Empty));
+                                                        usgsumData.CURRENCY = Constants.USD;
+                                                        usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
+
+                                                        usgsumResult.Add(usgsumData);
+
+                                                        this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (detailPosArray + 1 == detailArray.Length - 1)
+                                        {
+                                            break;
+                                        }
+
+                                        detailPosArray++;
                                     }
-
-                                    values++;
                                 }
-                            }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(messageFind))
-                            {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
 
-                                lock (this)
+                            }
+
+
+                            //***************************************************************************************************************************************************************************
+                            //*************************************************************** OtherChargesCredits ************************************************************************************************
+                            //***************************************************************************************************************************************************************************
+
+                            var OtherChargesFind = pageContent.FirstOrDefault(d => d.Contains(Constants.OtherChargesCredits));
+                            if (!string.IsNullOrEmpty(OtherChargesFind))
+                            {
+                                var firstOtherCharges = pageContent.FirstOrDefault(d => d.Contains(Constants.OtherChargesCredits));
+                                var firstOtherChargesStartPosArray = Array.IndexOf(detailArray, firstOtherCharges);
+
+
+                                while (!moneyRegex.IsMatch(detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe)[detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
                                 {
-                                    var nextPageList = helper.MessagingNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
 
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                        usgsumResult.Add(element);
-                                    }
-                                }
-                            }
-
-                            //***************************************************************************************************************************************************************************
-                            //*************************************************************** Data Usage ************************************************************************************************
-                            //***************************************************************************************************************************************************************************
-
-                            var dataFind = detail.FirstOrDefault(d => d.Contains(Constants.DataTitle));
-                            if (!string.IsNullOrEmpty(dataFind))
-                            {
-                                var firstData = detail.FirstOrDefault(d => d.Contains(Constants.DataTitle));
-                                var dataStartPosArray = Array.IndexOf(detailArray, firstData);
-
-
-                                while (!detailArray[dataStartPosArray + 1].Contains(Constants.TotalData))
-                                {//Total Voice
-
-                                    var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
-                                    var usgsumDetail = helper.GetData(detailArray[dataStartPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber, Constants.DATA);
+                                    var usgsumDetail = helper.GetOtherChargesCredits(detailArray[firstOtherChargesStartPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
 
 
                                     if (usgsumDetail != null)
@@ -659,571 +837,123 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                     }
 
-
-
-                                    if (dataStartPosArray + 1 == detailArray.Length - 1)
+                                    if (firstOtherChargesStartPosArray + 1 == detailArray.Length - 1)
                                     {
-                                        // search for other pages
-                                        var pageRegex = new Regex(Constants.pageRegex);
-                                        var pageValidation = pageRegex.Match(detailArray[1]);
-                                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                        lock (this)
-                                        {
-                                            var nextPageList = helper.DataNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.DATA, this.accountNumber);
-
-                                            nextPageList.ForEach(val => usgsumResult.Add(val));
-                                        }
                                         break;
                                     }
-                                    dataStartPosArray++;
+                                    firstOtherChargesStartPosArray++;
                                 }
                             }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(dataFind))
+                           
+
+                            var firstSurcharges = "";
+                            var surPosArray = 0;
+                            foreach (var item in pageContent.FindAll(d => d.Contains(Constants.Surcharges)))
                             {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                lock (this)
+                                if (new Regex(Constants.SurchargesTitleRegex).Match(item).Success)
                                 {
-                                    var nextPageList = helper.DataNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                        usgsumResult.Add(element);
-                                    }
+                                    firstSurcharges = item;
+                                    surPosArray = Array.IndexOf(detailArray, firstSurcharges);
+                                    break;
                                 }
                             }
 
                             //***************************************************************************************************************************************************************************
-                            //************************************************************************Purchases******************************************************************************************
+                            //**************************************************************** Surcharges section ***************************************************************************************
                             //***************************************************************************************************************************************************************************
-                            var purchasesTitle = detail.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle));
-                            if (!string.IsNullOrEmpty(purchasesTitle) || !string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle2))))
+                            if (!string.IsNullOrEmpty(firstSurcharges))
                             {
-                                var firstdetail = !string.IsNullOrEmpty(purchasesTitle) ? purchasesTitle : detail.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle2));
-
-                                var detailPosArray = Array.IndexOf(detailArray, firstdetail);
-
-                                //while (!detailArray[detailPosArray + 1].Contains(Constants.TotalPurchases))
-                                while (!finalValueRegex.IsMatch(detailArray[detailPosArray + 1].Split(Constants.Pipe)[detailArray[detailPosArray + 1].Split(Constants.Pipe).Length - 1]))
-                                {
-
-
-                                    var detailValues = helper.GetPurchases(detailArray[detailPosArray + 1], this.accountNumber, mrcDataSpName, serviceId, dateDueMonth, dateDueYear);
-
-                                    if (detailValues != null)
-                                    {
-                                        occResult.Add(detailValues);
-                                        this.lineTotal += System.Convert.ToDecimal(detailValues.CHG_AMT);
-                                    }
-
-                                    if (detailPosArray + 1 == detailArray.Length - 1)
-                                    {
-                                        // search for other pages
-                                        var pageRegex = new Regex(Constants.pageRegex);
-                                        var pageValidation = pageRegex.Match(detailArray[1]);
-                                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-                                        lock (this)
-                                        {
-                                            var nextPageList = helper.PurchaseNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber, dateDueMonth, dateDueYear);
-
-                                            foreach (DetailDto element in nextPageList)
-                                            {
-                                                this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                                occResult.Add(element);
-                                            }
-                                        }
-                                        break;
-                                    }
-
-                                    detailPosArray++;
-                                }
-                            }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.PurchasesTitle))))
-                            {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                lock (this)
-                                {
-                                    var nextPageList = helper.PurchaseNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber, dateDueMonth, dateDueYear);
-
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                        occResult.Add(element);
-                                    }
-                                }
-                            }
-
-
-
-                            //***************************************************************************************************************************
-                            //************************************************** Roaming ****************************************************************
-                            //***************************************************************************************************************************
-
-
-                            var roamingFind = detail.FirstOrDefault(d => d.Contains(Constants.RoamingTitle));
-                            if (!string.IsNullOrEmpty(roamingFind))
-                            {
-
-                                var detailPosArray = Array.IndexOf(detailArray, roamingFind);
-
-
-                                while (!detailArray[detailPosArray + 1].Contains(Constants.TotalRoaming))
+                                while (!finalValueRegex.IsMatch(detailArray[surPosArray + 1].Split(Constants.Pipe)[detailArray[surPosArray + 1].Split(Constants.Pipe).Length - 1]) && !detailArray[surPosArray + 1].Contains(Constants.OtherChargesCredits))
                                 {//Total Voice
 
-                                    //var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
-                                    var share = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
 
-                                    DetailDto usgsumDetail = helper.GetRoaming(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber);
+                                    var usgsumDetail = helper.GetSurcharges(detailArray[surPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
 
                                     if (usgsumDetail != null)
                                     {
-                                        usgsumResult.Add(usgsumDetail);
+                                        surTaxesResult.Add(usgsumDetail);
+
                                         this.lineTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
                                     }
 
 
-                                    if (detailPosArray + 1 == detailArray.Length - 1)
+                                    if (surPosArray + 1 == detailArray.Length - 1)
                                     {
-                                        // search for other pages
-                                        var pageRegex = new Regex(Constants.pageRegex);
-                                        var pageValidation = pageRegex.Match(detailArray[1]);
-                                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-                                        lock (this)
-                                        {
-                                            var nextPageList = helper.RoamingNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                            nextPageList.ForEach(val => usgsumResult.Add(val));
-                                        }
-
                                         break;
                                     }
-
-                                    detailPosArray++;
+                                    surPosArray++;
                                 }
                             }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(roamingFind))
-                            {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                lock (this)
-                                {
-                                    var nextPageList = helper.RoamingNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                        usgsumResult.Add(element);
-                                    }
-                                }
-                            }
-
-
-
+                          
                             //***************************************************************************************************************************************************************************
-                            //****************************************************************International Section**************************************************************************************
+                            //******************************************************** Taxes, Governmental Surcharges ***********************************************************************************
                             //***************************************************************************************************************************************************************************
-
-                            if (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.InternationTitle))))
+                            var lastTaxesGovernmentalSurcharges = pageContent.LastOrDefault(d => d.Contains(Constants.TaxesGovernmentalSurcharges));
+                            if (!string.IsNullOrEmpty(lastTaxesGovernmentalSurcharges) && new Regex(Constants.TaxesGovernmentalSurchargesFeesTitleRegex).Match(lastTaxesGovernmentalSurcharges).Success)
                             {
-                                var firstdetail = detail.FirstOrDefault(d => d.Contains(Constants.InternationTitle));
-                                var detailPosArray = Array.IndexOf(detailArray, firstdetail);
 
-                                while (!detailArray[detailPosArray + 1].Contains(Constants.TotaInternational))
+                                var taxesPosArray = Array.IndexOf(detailArray, lastTaxesGovernmentalSurcharges);
+
+                                int values = taxesPosArray;
+
+                                while (!finalValueRegex.IsMatch(detailArray[values + 1].Split(Constants.Pipe)[detailArray[values + 1].Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
 
+                                    var surValues = helper.w(detailArray[values + 1], accountNumber, mrcDataSpName, serviceId);
 
-                                    var detailValues = detailArray[detailPosArray + 1];
-                                    DetailDto usgsumData = new DetailDto();
-
-
-                                    if (new Regex(Constants.InternationalMessageRegex).IsMatch(detailValues))
+                                    if (surValues != null)
                                     {
-
-                                        var messagingValuesInter = helper.GetMessaging(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
-
-                                        if (messagingValuesInter != null)
-                                        {
-                                            usgsumResult.Add(messagingValuesInter);
-                                            this.lineTotal += System.Convert.ToDecimal(messagingValuesInter.CHG_AMT);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (new Regex(Constants.InternationDataRegex).IsMatch(detailValues))
-                                        {
-
-                                            var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
-
-
-                                            if (usgsumDetail != null)
-                                            {
-                                                usgsumResult.Add(usgsumDetail);
-                                                this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                            }
-                                        }
-                                        else
-                                        {
-
-                                            var internationMinutesRegex = new Regex(Constants.InternationalMinutesRegex).Match(detailValues);
-
-                                            if (internationMinutesRegex.Success)
-                                            {
-
-                                                var internationMinutesRegexGroup = internationMinutesRegex.Groups;
-
-                                                usgsumData.UNIQ_ID = Constants.USGSUM;
-                                                usgsumData.CHG_CLASS = Constants.LevelOne;
-                                                usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                                                usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                                usgsumData.SP_NAME = mrcDataSpName.TrimStart();
-                                                usgsumData.SUBSCRIBER = serviceId;
-
-                                                usgsumData.CHG_CODE_1 = internationMinutesRegexGroup[1].ToString().Replace(Constants.Pipe, ' ');
-                                                usgsumData.CHG_QTY1_ALLOWED = internationMinutesRegexGroup[3].ToString().Contains("unlimited") ? "" : internationMinutesRegexGroup[5].ToString();
-                                                usgsumData.CHG_QTY1_TYPE = Utils.GetChargesType(internationMinutesRegexGroup[2].ToString());
-                                                usgsumData.CHG_QTY1_USED = internationMinutesRegexGroup[6].ToString().Replace(Constants.Hyphen, string.Empty);
-                                                usgsumData.CHG_QTY1_BILLED = internationMinutesRegexGroup[7].ToString().Replace(Constants.Hyphen, string.Empty).Equals(string.Empty) ? "0" : internationMinutesRegexGroup[7].ToString();
-                                                usgsumData.CHG_AMT = Utils.NumberFormat(internationMinutesRegexGroup[8].ToString().Replace(Constants.Hyphen, string.Empty).Replace(Constants.MoneySign, string.Empty));
-
-                                                usgsumData.CURRENCY = Constants.USD;
-                                                usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
-
-                                                usgsumResult.Add(usgsumData);
-
-                                                this.lineTotal += !string.IsNullOrEmpty(usgsumData.CHG_AMT) ? System.Convert.ToDecimal(usgsumData.CHG_AMT) : 0;
-                                            }
-                                            else
-                                            {
-
-                                                var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
-
-                                                if (internationalVoiceRegex.Success)
-                                                {
-
-                                                    var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
-
-                                                    usgsumData.UNIQ_ID = Constants.USGSUM;
-                                                    usgsumData.CHG_CLASS = Constants.LevelOne;
-                                                    usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                                                    usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                                    usgsumData.SP_NAME = mrcDataSpName.TrimStart();
-                                                    usgsumData.SUBSCRIBER = serviceId;
-                                                    usgsumData.CHG_CODE_1 = internationalVoiceRegexGroup[2].ToString().Replace(Constants.Pipe, ' ');
-
-                                                    usgsumData.CHG_AMT = Utils.NumberFormat(internationalVoiceRegexGroup[3].ToString().Replace(Constants.MoneySign, string.Empty));
-                                                    usgsumData.CURRENCY = Constants.USD;
-                                                    usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
-
-                                                    usgsumResult.Add(usgsumData);
-
-                                                    this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
-                                                }
-                                            }
-                                        }
+                                        surTaxesResult.Add(surValues);
+                                        this.lineTotal += System.Convert.ToDecimal(surValues.CHG_AMT);
                                     }
 
-
-
-
-                                    if (detailPosArray + 1 == detailArray.Length - 1)
+                                    if (values + 1 == detailArray.Length - 1)
                                     {
-                                        // search for other pages
-                                        var pageRegex = new Regex(Constants.pageRegex);
-                                        var pageValidation = pageRegex.Match(detailArray[1]);
-                                        var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                        lock (this)
-                                        {
-                                            var nextPageList = helper.InternationNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                            foreach (DetailDto element in nextPageList)
-                                            {
-                                                this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                                usgsumResult.Add(element);
-                                            }
-                                        }
                                         break;
                                     }
-
-                                    detailPosArray++;
-                                }
-                            }
-                            else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.InternationTitle))))
-                            {
-                                var pageRegex = new Regex(Constants.pageRegex);
-                                var pageValidation = pageRegex.Match(detailArray[1]);
-                                var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                lock (this)
-                                {
-                                    var nextPageList = helper.InternationNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                    foreach (DetailDto element in nextPageList)
-                                    {
-                                        this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT.ToString());
-                                        usgsumResult.Add(element);
-                                    }
+                                    values++;
                                 }
                             }
 
-                        }
-
-                        //***************************************************************************************************************************************************************************
-                        //*************************************************************** OtherChargesCredits ************************************************************************************************
-                        //***************************************************************************************************************************************************************************
-
-                        var OtherChargesFind = detail.FirstOrDefault(d => d.Contains(Constants.OtherChargesCredits));
-                        if (!string.IsNullOrEmpty(OtherChargesFind))
-                        {
-                            var firstOtherCharges = detail.FirstOrDefault(d => d.Contains(Constants.OtherChargesCredits));
-                            var firstOtherChargesStartPosArray = Array.IndexOf(detailArray, firstOtherCharges);
 
 
-                            while (!moneyRegex.IsMatch(detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe)[detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                            //***************************************************************************************************************************************************
+                            //******************************************************** Total Current Charges For ****************************************************************
+                            //***************************************************************************************************************************************************
+
+                            if (!string.IsNullOrEmpty(totalCurrentChargesFor))
                             {
 
-                                var usgsumDetail = helper.GetOtherChargesCredits(detailArray[firstOtherChargesStartPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
+                                var ftotalCurrentChargesRegex = new Regex(Constants.TotalCurrentChargesRegex).Match(totalCurrentChargesFor).Groups;
 
 
-                                if (usgsumDetail != null)
-                                {
-                                    usgsumResult.Add(usgsumDetail);
-                                    this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                }
+                                DetailDto mrcTotal = new DetailDto();
 
+                                var totalValue = System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) + System.Convert.ToDecimal(accountMonthlyChargesSum);
 
+                                mrcTotal.UNIQ_ID = Constants.MRC;
+                                mrcTotal.CHG_CLASS = Constants.LevelOne;
+                                mrcTotal.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                mrcTotal.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                mrcTotal.SP_NAME = mrcDataSpName.TrimStart();
+                                mrcTotal.SUBSCRIBER = serviceId;
+                                mrcTotal.CHG_CODE_1 = ftotalCurrentChargesRegex[1].ToString();
+                                mrcTotal.CHG_AMT = totalValue.ToString();
+                                mrcTotal.CURRENCY = Constants.USD;
+                                mrcTotal.INFO_ONLY_IND = "Y";
+                                //mrcTotal.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
+                                mrcTotal.UDF = "";
 
-                                if (firstOtherChargesStartPosArray + 1 == detailArray.Length - 1)
-                                {
-                                    // search for other pages
-                                    var pageRegex = new Regex(Constants.pageRegex);
-                                    var pageValidation = pageRegex.Match(detailArray[1]);
-                                    var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                    lock (this)
-                                    {
-                                        var nextPageList = helper.OtherChargesCreditsNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.DATA, this.accountNumber);
-
-                                        nextPageList.ForEach(val => usgsumResult.Add(val));
-                                    }
-                                    break;
-                                }
-                                firstOtherChargesStartPosArray++;
-                            }
-                        }
-                        else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(OtherChargesFind))
-                        {
-                            var pageRegex = new Regex(Constants.pageRegex);
-                            var pageValidation = pageRegex.Match(detailArray[1]);
-                            var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                            lock (this)
-                            {
-                                var nextPageList = helper.OtherChargesCreditsNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                foreach (DetailDto element in nextPageList)
-                                {
-                                    this.lineTotal += !string.IsNullOrEmpty(element.CHG_AMT) ? System.Convert.ToDecimal(element.CHG_AMT) : 0;
-                                    usgsumResult.Add(element);
-                                }
-                            }
-                        }
-
-                        var firstSurcharges = "";
-                        var surPosArray = 0;
-                        foreach (var item in detail.FindAll(d => d.Contains(Constants.Surcharges)))
-                        {
-                            if (new Regex(Constants.SurchargesTitleRegex).Match(item).Success)
-                            {
-                                firstSurcharges = item;
-                                surPosArray = Array.IndexOf(detailArray, firstSurcharges);
-                                break;
-                            }
-                        }
-
-                        //***************************************************************************************************************************************************************************
-                        //**************************************************************** Surcharges section ***************************************************************************************
-                        //***************************************************************************************************************************************************************************
-                        if (!string.IsNullOrEmpty(firstSurcharges))
-                        {
-
-
-
-                            while (!finalValueRegex.IsMatch(detailArray[surPosArray + 1].Split(Constants.Pipe)[detailArray[surPosArray + 1].Split(Constants.Pipe).Length - 1]) && !detailArray[surPosArray + 1].Contains(Constants.OtherChargesCredits))
-                            {//Total Voice
-
-
-                                var usgsumDetail = helper.GetSurcharges(detailArray[surPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
-
-                                if (usgsumDetail != null)
-                                {
-                                    surTaxesResult.Add(usgsumDetail);
-
-                                    this.lineTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
-                                }
-
-
-                                if (surPosArray + 1 == detailArray.Length - 1)
-                                {
-                                    // search for other pages
-                                    var pageRegex = new Regex(Constants.pageRegex);
-                                    var pageValidation = pageRegex.Match(detailArray[1]);
-                                    var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                    lock (this)
-                                    {
-                                        var nextPageList = helper.SurchargesNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.SURCHARGES, this.accountNumber);
-
-                                        foreach (DetailDto element in nextPageList)
-                                        {
-                                            this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                            surTaxesResult.Add(element);
-                                        }
-                                    }
-                                    break;
-                                }
-                                surPosArray++;
+                                result.Add(mrcTotal);
                             }
 
 
+                            pageContent = helper.getPageContent(pageNumber++);
+                            
+                            
                         }
-                        else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(firstSurcharges))
-                        {
-                            var pageRegex = new Regex(Constants.pageRegex);
-                            var pageValidation = pageRegex.Match(detailArray[1]);
-                            var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
+                        while (totalCurrentChargesFor == null) ;
 
-                            lock (this)
-                            {
-                                var nextPageList = helper.SurchargesNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                foreach (DetailDto element in nextPageList)
-                                {
-                                    this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                    surTaxesResult.Add(element);
-                                }
-                            }
-                        }
-
-                        //***************************************************************************************************************************************************************************
-                        //******************************************************** Taxes, Governmental Surcharges ***********************************************************************************
-                        //***************************************************************************************************************************************************************************
-                        var lastTaxesGovernmentalSurcharges = detail.LastOrDefault(d => d.Contains(Constants.TaxesGovernmentalSurcharges));
-                        if (!string.IsNullOrEmpty(lastTaxesGovernmentalSurcharges) && new Regex(Constants.TaxesGovernmentalSurchargesFeesTitleRegex).Match(lastTaxesGovernmentalSurcharges).Success)
-                        {
-
-                            var taxesPosArray = Array.IndexOf(detailArray, lastTaxesGovernmentalSurcharges);
-
-                            int values = taxesPosArray;
-
-                            while (!finalValueRegex.IsMatch(detailArray[values + 1].Split(Constants.Pipe)[detailArray[values + 1].Split(Constants.Pipe).Length - 1]))
-                            {//Total Voice
-
-                                var surValues = helper.GetTaxesGovermentalSurcharges(detailArray[values + 1], accountNumber, mrcDataSpName, serviceId);
-
-                                if (surValues != null)
-                                {
-                                    surTaxesResult.Add(surValues);
-                                    this.lineTotal += System.Convert.ToDecimal(surValues.CHG_AMT);
-                                }
-
-                                if (values + 1 == detailArray.Length - 1)
-                                {
-                                    // search for other pages
-                                    var pageRegex = new Regex(Constants.pageRegex);
-                                    var pageValidation = pageRegex.Match(detailArray[1]);
-                                    var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                                    lock (this)
-                                    {
-
-
-                                        var nextPageList = helper.TaxesGovernmentalSurchargesNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.TAXESGOVT, this.accountNumber);
-
-                                        foreach (DetailDto element in nextPageList)
-                                        {
-                                            this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                            surTaxesResult.Add(element);
-                                        }
-                                    }
-
-                                    break;
-                                }
-                                values++;
-
-                            }
-                        }
-                        else if (totalCurrentChargesFor == null && (string.IsNullOrEmpty(lastTaxesGovernmentalSurcharges) ||
-                            !(new Regex(Constants.TaxesGovernmentalSurchargesFeesTitleRegex).Match(lastTaxesGovernmentalSurcharges).Success)) && spNameChecker != null)
-                        {
-                            var pageRegex = new Regex(Constants.pageRegex);
-                            var pageValidation = pageRegex.Match(detailArray[1]);
-                            var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                            lock (this)
-                            {
-                                var nextPageList = helper.TaxesGovernmentalSurchargesNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber);
-
-                                foreach (DetailDto element in nextPageList)
-                                {
-                                    this.lineTotal += System.Convert.ToDecimal(element.CHG_AMT);
-                                    surTaxesResult.Add(element);
-                                }
-                            }
-                        }
-
-                        //***************************************************************************************************************************************************
-                        //******************************************************** Total Current Charges For ****************************************************************
-                        //***************************************************************************************************************************************************
-                        if (!string.IsNullOrEmpty(totalCurrentChargesFor))
-                        {
-
-                            var pageRegex = new Regex(Constants.TotalCurrentChargesRegex).Match(totalCurrentChargesFor).Groups;
-
-
-                            DetailDto mrcTotal = new DetailDto();
-
-                            var totalValue = System.Convert.ToDecimal(pageRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) + System.Convert.ToDecimal(accountMonthlyChargesSum);
-
-                            mrcTotal.UNIQ_ID = Constants.MRC;
-                            mrcTotal.CHG_CLASS = Constants.LevelOne;
-                            mrcTotal.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                            mrcTotal.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                            mrcTotal.SP_NAME = mrcDataSpName.TrimStart();
-                            mrcTotal.SUBSCRIBER = serviceId;
-                            mrcTotal.CHG_CODE_1 = pageRegex[1].ToString();
-                            mrcTotal.CHG_AMT = totalValue.ToString();
-                            mrcTotal.CURRENCY = Constants.USD;
-                            mrcTotal.INFO_ONLY_IND = "Y";
-                            //mrcTotal.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
-                            mrcTotal.UDF = "";
-
-                            result.Add(mrcTotal);
-                        }
-                        else if (totalCurrentChargesFor == null && string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.TotalCurrentChargesFor))) &&
-                            spNameChecker != null && (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.SummaryFor))) || !string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.DetailFor)))))
-                        {
-
-                            var pageRegex = new Regex(Constants.pageRegex);
-                            var pageValidation = pageRegex.Match(detailArray[1]);
-                            var pageNumber = Convert.ToInt32(pageValidation.Value.Split("of")[0]);
-
-                            lock (this)
-                            {
-                                var nextPageList = helper.TotalCurrentChargesNextDetailPageExtraction(pageNumber, lineNumber, mrcDataSpName.TrimStart(), (int)DetailType.VOICE, this.accountNumber, accountMonthlyChargesSum);
-
-                                nextPageList.ForEach(val => result.Add(val));
-                            }
-                        }
                     }
                 }
                 else
@@ -1282,29 +1012,30 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     }
                                     else
                                     {
-                                        if (!new Regex(Constants.M2MUsgsumAvoid).IsMatch(dataValues))
+                                        var m2mUsgMatch = new Regex(Constants.M2MUsgsum).Match(dataValues);
+                                        if (m2mUsgMatch.Success)
                                         {
-                                            var m2mUsgMatch = new Regex(Constants.M2MUsgsum).Match(dataValues);
-                                            if (m2mUsgMatch.Success)
+                                            var m2mUsgMatchGroup = m2mUsgMatch.Groups;
+                                            var chgQty1Used = m2mUsgMatchGroup[12].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[12].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[12].ToString());
+                                            var chgQty1Allowed = m2mUsgMatchGroup[10].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[10].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[10].ToString());
+                                            var chgQty1Billed = m2mUsgMatchGroup[14].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[14].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[14].ToString());
+                                            var chgAmt = m2mUsgMatchGroup[8].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[8].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[8].ToString());
+                                            //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
+                                            usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, chgQty1Used, chgQty1Allowed,chgQty1Billed, chgAmt, Constants.DATA));
+                                        }
+                                        else
+                                        {
+                                            var m2mUsgsumMsgMatch = new Regex(Constants.M2MUsgsumMsg).Match(dataValues);
+                                            if (m2mUsgsumMsgMatch.Success)
                                             {
-                                                var m2mUsgMatchGroup = m2mUsgMatch.Groups;
+                                                var m2mUsgsumMsgMatchGroup = m2mUsgsumMsgMatch.Groups;
                                                 //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
-                                                usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, Utils.RemoveTextFromNumber(m2mUsgMatchGroup[9].ToString().Replace(Constants.Hyphen, string.Empty)), Utils.RemoveTextFromNumber(m2mUsgMatchGroup[7].ToString().Replace(Constants.Hyphen, string.Empty)), Utils.RemoveTextFromNumber(m2mUsgMatchGroup[11].ToString().Replace(Constants.Hyphen, string.Empty)), Utils.NumberFormat(m2mUsgMatchGroup[5].ToString()), Constants.DATA));
+                                                usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgsumMsgMatchGroup[1].ToString(), Constants.ChargesType_MSG, m2mUsgsumMsgMatchGroup[7].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[5].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[9].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[2].ToString().Replace(Constants.Hyphen, string.Empty), Constants.MESSAGING));
                                             }
-                                            else
+                                            else if (dataValues.Contains(Constants.Subtotal))
                                             {
-                                                var m2mUsgsumMsgMatch = new Regex(Constants.M2MUsgsumMsg).Match(dataValues);
-                                                if (m2mUsgsumMsgMatch.Success)
-                                                {
-                                                    var m2mUsgsumMsgMatchGroup = m2mUsgsumMsgMatch.Groups;
-                                                    //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
-                                                    usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgsumMsgMatchGroup[1].ToString(), Constants.ChargesType_MSG, m2mUsgsumMsgMatchGroup[7].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[5].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[9].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[2].ToString().Replace(Constants.Hyphen, string.Empty), Constants.MESSAGING));
-                                                }
-                                                else if (dataValues.Contains(Constants.Subtotal))
-                                                {
 
-                                                    M2MPlanName = "";
-                                                }
+                                                M2MPlanName = "";
                                             }
                                         }
                                     }
@@ -1869,6 +1600,22 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             }
 
         }
+
+
+        public int getLineDetailNumPage(int page)
+        {
+
+            int numPages = 0;
+            string pageText = "";
+            do
+            {
+                numPages++;
+                pageText = document.Pages[page].ExtractText();
+            }
+            while (!pageText.Contains(Constants.TotalCurrentChargesFor)) ;
+            return numPages;
+        }
+
 
         public void PlainTextConstructor(FileDto file, HeaderDto header, List<DetailDto> details, string sourcePath, string outPutPath, string processedFilesPath)
         {
