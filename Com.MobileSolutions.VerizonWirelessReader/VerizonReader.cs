@@ -421,6 +421,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             adjAccountResult.Remove(element);
                         }
 
+                        /*
+                         Through the follow do - while we get the number of pages that a line detail has.
+                         */
                         var pageContent = detail;
                         do
                         {
@@ -844,8 +847,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     firstOtherChargesStartPosArray++;
                                 }
                             }
-                           
 
+
+
+                            //***************************************************************************************************************************************************************************
+                            //**************************************************************** Surcharges section ***************************************************************************************
+                            //***************************************************************************************************************************************************************************
                             var firstSurcharges = "";
                             var surPosArray = 0;
                             foreach (var item in pageContent.FindAll(d => d.Contains(Constants.Surcharges)))
@@ -858,9 +865,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 }
                             }
 
-                            //***************************************************************************************************************************************************************************
-                            //**************************************************************** Surcharges section ***************************************************************************************
-                            //***************************************************************************************************************************************************************************
+
                             if (!string.IsNullOrEmpty(firstSurcharges))
                             {
                                 while (!finalValueRegex.IsMatch(detailArray[surPosArray + 1].Split(Constants.Pipe)[detailArray[surPosArray + 1].Split(Constants.Pipe).Length - 1]) && !detailArray[surPosArray + 1].Contains(Constants.OtherChargesCredits))
@@ -946,11 +951,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 result.Add(mrcTotal);
                             }
-
-
                             pageContent = helper.getPageContent(pageNumber++);
-                            
-                            
                         }
                         while (totalCurrentChargesFor == null) ;
 
