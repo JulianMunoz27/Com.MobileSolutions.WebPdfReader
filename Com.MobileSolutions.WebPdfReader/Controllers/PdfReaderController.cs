@@ -62,8 +62,6 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                     var preBuildText = helper.Prebuild(document, pathValues.Path);
                     if (preBuildText.Any())
                     {
-
-
                         header = verizonReader.GetHeaderValues(preBuildText);
                         file = verizonReader.GetFileValues(fileName);
                         var detailList = helper.ReadDetails(document, pathValues.Path);

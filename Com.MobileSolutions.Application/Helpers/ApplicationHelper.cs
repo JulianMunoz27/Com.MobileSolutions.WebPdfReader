@@ -215,12 +215,33 @@ namespace Com.MobileSolutions.Application.Helpers
                 page = document.Pages[pageNumber - 1].ExtractText().Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
             }
 
+            var lineCount = 0;
+
             foreach (var line in page)
             {
-                RegexOptions options = RegexOptions.None;
-                Regex regex = new Regex("[ ]{2,}", options);
-                formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+                var len = line.Length;
+                if (len > 57 && lineCount >= 4)
+                {
+                    var lineWithChars = line.Insert(57, "%@");
+                    RegexOptions options = RegexOptions.None;
+                    Regex regex = new Regex("[ ]{2,}", options);
+                    formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
+                }
+                else
+                {
+                    RegexOptions options = RegexOptions.None;
+                    Regex regex = new Regex("[ ]{2,}", options);
+                    formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+                }
+                lineCount++;
             }
+
+            //foreach (var line in page)
+            //{
+            //    RegexOptions options = RegexOptions.None;
+            //    Regex regex = new Regex("[ ]{2,}", options);
+            //    formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+            //}
 
             return formattedPage;
         }
@@ -1374,6 +1395,13 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             return mrcData;
+        }
+
+        public string RemoveLeftSide(string line)
+        {
+            var cutRegex = new Regex(@".*(?=%@)");
+            var convertedLine = cutRegex.Match(line).Value;
+            return !string.IsNullOrEmpty(convertedLine) ? line.Replace(convertedLine, string.Empty).Replace("%@", string.Empty) : line.Replace("%@", string.Empty);
         }
     }
 }
