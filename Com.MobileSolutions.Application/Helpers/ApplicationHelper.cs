@@ -90,40 +90,13 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
-            //var text = pages[18014].ExtractText().Remove(0, 70);
-            //var splittedPage = text.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-            //for (var i = 0; i <= splittedPage.Count - 1; i++)
-            //{
-            //    var len = splittedPage[i].Length;
-            //    if (len > 57 && i >= 4)
-            //    {
-            //        var regexTest = new Regex(@".*(?=%@)");
-            //        var foo = regexTest.Match(splittedPage[i].Insert(57, "%@"));
-            //        var foo2 = !string.IsNullOrEmpty(foo.Value) ? splittedPage[i].Insert(57, "%@").Replace(foo.Value, "") : splittedPage[i].Insert(57, "%@");
-            //        pageList.Add(foo2);
-            //    }
-            //    else
-            //    {
-            //        pageList.Add(splittedPage[i]);
-            //    }
-            //}
-
-            //var texts = string.Join("\r\n", pageList.ToArray());            
+            //var text = pages[1023].ExtractText().Remove(0, 70);
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
-            //text = text.Substring(0, 57);
             //pageList.Add(text);
 
-            //var text2 = pages[18015].ExtractText().Remove(0, 70);
-            //RegexOptions options2 = RegexOptions.None;
-            //Regex regex2 = new Regex("[ ]{2,}", options2);
-            //text2 = regex2.Replace(text, "|");
-            //text2 = text2.Substring(0, 57);
-            //pageList.Add(text2);
-
-            //detailList.Add(DetailPageReader(document, 18015));
-            //detailList.Add(DetailPageReader(document, 18016));
+            //detailList.Add(DetailPageReader(document, 59));
 
             foreach (var page in pageList)
             {
@@ -284,7 +257,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -349,7 +322,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -417,7 +390,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -484,7 +457,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -548,7 +521,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -615,7 +588,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -699,7 +672,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -765,7 +738,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -836,7 +809,7 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -895,7 +868,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 pageText = document.Pages[page].ExtractText();
             }
 
-            if (pageText.Contains(lineNumber))
+            if (!pageText.Contains(Constants.YourPlanMonthlyCharges))
             {
                 var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -973,12 +946,10 @@ namespace Com.MobileSolutions.Application.Helpers
                                 }
                                 else
                                 {
-
                                     var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
 
                                     if (internationalVoiceRegex.Success)
                                     {
-
                                         var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
 
                                         usgsumData.UNIQ_ID = Constants.USGSUM;
@@ -1022,6 +993,27 @@ namespace Com.MobileSolutions.Application.Helpers
 
             }
             return detailList;
+        }
+
+        public List<string> getPageContent(int page)
+        {
+            List<string> formattedPage = new List<string>();
+
+            if(page < document.Pages.Count)
+            {
+                string pageText;
+                pageText = document.Pages[page].ExtractText();
+                
+                var nextPage = pageText.Remove(0, 70).Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                foreach (var line in nextPage)
+                {
+                    RegexOptions options = RegexOptions.None;
+                    Regex regex = new Regex("[ ]{2,}", options);
+                    formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
+                }
+            }
+            return formattedPage;
         }
 
         public DetailDto GetTaxesGovermentalSurcharges(string surValues, string accountNumber, string mrcDataSpName, string serviceId)

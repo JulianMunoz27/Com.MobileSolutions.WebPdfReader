@@ -43,11 +43,49 @@ namespace Com.MobileSolutions.VerizonTest
         [Test]
         public void M2MUsgsum_Regex_ReturnsTrue()
         {
-            var firstScenario = new Regex(M2MUsgsum).IsMatch("GIGABYTE USAGE|1 of 91|--|.105GB|--");
-            var secondScenario = new Regex(M2MUsgsum).IsMatch("GIGABYTE USAGE|91 of 91|--|455.000GB|184.209GB|--");
+            string[] arrayScenario = { 
+                "GIGABYTE USAGE|1 of 91|--|.105GB|--", 
+                "GIGABYTE USAGE|91 of 91|--|455.000GB|184.209GB|--",
+                "|10GB/ $10/GB|1 of 1|$.00|$10.00|10.000GB|10.229GB|.229GB"
+            };
 
-            Assert.IsTrue(firstScenario);
-            Assert.IsTrue(secondScenario);
+            var firstScenario = new Regex(M2MUsgsum).Match(arrayScenario[0]);
+            Assert.IsTrue(firstScenario.Success);
+
+            if (firstScenario.Success)
+            {
+                var firstScenarioGroup = firstScenario.Groups;
+                Assert.AreEqual(firstScenarioGroup[1].ToString(), "GIGABYTE USAGE");
+                Assert.AreEqual(firstScenarioGroup[12].ToString(), ".105GB");
+            }
+
+            var firstScenario1 = new Regex(M2MUsgsum).Match(arrayScenario[1]);
+            Assert.IsTrue(firstScenario1.Success);
+
+            if (firstScenario1.Success)
+            {
+                var firstScenarioGroup = firstScenario1.Groups;
+                Assert.AreEqual(firstScenarioGroup[1].ToString(), "GIGABYTE USAGE");
+                Assert.AreEqual(firstScenarioGroup[10].ToString(), "455.000GB");
+                Assert.AreEqual(firstScenarioGroup[12].ToString(), "184.209GB");
+            }
+
+            var firstScenario2 = new Regex(M2MUsgsum).Match(arrayScenario[2]);
+            Assert.IsTrue(firstScenario2.Success);
+
+
+            if (firstScenario2.Success)
+            {
+                var firstScenarioGroup = firstScenario2.Groups;
+                Assert.AreEqual(firstScenarioGroup[1].ToString(), "10GB/ $10/GB");
+                Assert.AreEqual(firstScenarioGroup[6].ToString(), "$10.00");
+                Assert.AreEqual(firstScenarioGroup[10].ToString(), "10.000GB");
+                Assert.AreEqual(firstScenarioGroup[12].ToString(), "10.229GB");
+                Assert.AreEqual(firstScenarioGroup[14].ToString(), ".229GB");
+            }
+
+
+
         }
 
         [Test]
