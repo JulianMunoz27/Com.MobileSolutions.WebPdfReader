@@ -439,10 +439,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
 
+                                var removedText = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
 
-                                while (!finalValueRegex.IsMatch(detailArray[occPosArray + 1].Split(Constants.Pipe)[detailArray[occPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                                while (!finalValueRegex.IsMatch(removedText.Split(Constants.Pipe)[removedText.Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
-                                    var mrcValues = detailArray[occPosArray + 1];
+                                    var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
                                     DetailDto usgsumDetail = new DetailDto();
 
 
