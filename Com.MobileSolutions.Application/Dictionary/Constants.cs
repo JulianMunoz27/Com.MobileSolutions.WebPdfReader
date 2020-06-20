@@ -30,7 +30,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string AccountChargesAndCreditsContinue = "Account Charges and Credits, continued";
         public static string MonthlyCharges = "Monthly Charges";
         public static string YourPlan = "Your Plan";
-        public static string YourPlanMonthlyCharges = "Your Plan|%@Monthly Charges";
+        public static string YourPlanMonthlyCharges = "Your Plan|Monthly Charges";
         public static string TotalCurrentChargesFor = "Total Current Charges for";
         public static string AccountMonthlyCharges = "Account Monthly Charges";
         public static string AccountUsageCharges = "Account Usage Charges";
@@ -77,6 +77,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string TotalChargesDuebyTitle = "Total Charges Due by";
         public static string TotalAmountTitle = "Total Amount";
         public static string OtherChargesCredits = "Other Charges and Credits";
+        public static string RawYourPlanMonthlyCharges = "        Your Plan                                        Monthly Charges";
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************
         //*******************************************************************************************************************
