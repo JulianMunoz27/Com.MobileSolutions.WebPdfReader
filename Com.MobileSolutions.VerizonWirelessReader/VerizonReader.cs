@@ -441,7 +441,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var occPosArray = Array.IndexOf(detailArray, firstOcc);
 
                                 var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
-                                planName = planName.Replace("%@", string.Empty);
+                                planName = planName.Replace(Constants.LineSeparator, string.Empty);
                                 while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
                                     var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
@@ -1003,7 +1003,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 if (matchName.Success && !dataValues.Contains(Constants.Subtotal))
                                 {
-                                    M2MPlanName = matchName.Groups[1].ToString().Replace("%@", string.Empty);
+                                    M2MPlanName = matchName.Groups[1].ToString().Replace(Constants.LineSeparator, string.Empty);
                                     //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
 
 

@@ -222,7 +222,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 var len = line.Length;
                 if (len > 57 && lineCount >= 4)
                 {
-                    var lineWithChars = line.Insert(57, "%@");
+                    var lineWithChars = line.Insert(57, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
                     formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
@@ -1385,7 +1385,7 @@ namespace Com.MobileSolutions.Application.Helpers
         {
             var cutRegex = new Regex(@".*(?=%@)");
             var convertedLine = cutRegex.Match(line).Value;
-            return !string.IsNullOrEmpty(convertedLine) ? line.Replace(convertedLine, string.Empty).Replace("%@", string.Empty) : line.Replace("%@", string.Empty);
+            return !string.IsNullOrEmpty(convertedLine) ? line.Replace(convertedLine, string.Empty).Replace(Constants.LineSeparator, string.Empty) : line.Replace(Constants.LineSeparator, string.Empty);
         }
     }
 }

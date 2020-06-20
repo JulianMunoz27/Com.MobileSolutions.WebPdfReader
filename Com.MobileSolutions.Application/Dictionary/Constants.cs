@@ -14,6 +14,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string StringPipe = "|";
         public static string WhiteSpace = " ";
         public static char Pipe = '|';
+        public static string LineSeparator = "%@";
 
         public static string FileName = @"C:\Users\kzuluaga\Documents\Ingeneo\Proyectos\6. EEUU\Pdf Reader\Test Documents\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011.pdf";//201912_VerizonWireless_78590905400001.pdf
         public static string OutPutPath = @"C:\Users\kzuluaga\Documents\Ingeneo\Proyectos\6. EEUU\Pdf Reader\Test Documents\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011\";
@@ -149,6 +150,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string BillDateRegex = @"(\|?)(Bill Date\|)([A-z\s\-0-9\,]+)";
         public static string QuickBillSummaryDateRegex = @"(\|?)(Quick Bill Summary\|)([A-z\s\-0-9\,]+)";
         public static string DueDateRegex = @"([^\|]+)(\|[^\|]+)([\s|\|])(\d{1,2}\/\d{1,2}\/\d{1,2})";
+        public static string LineSeparatorRegex = @"";
         //*******************************************************************************************************************
 
         public static string Voice = "Voice";
