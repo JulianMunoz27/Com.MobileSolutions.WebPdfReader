@@ -815,7 +815,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                     {
                                                         if (!detailValues.Contains("Usage While"))
                                                         {
-                                                            planName = $"{planName} {detailValues.Replace(Constants.Pipe,' ')}";
+                                                            planName = $"{planName.Trim()} {detailValues.Trim().Replace(Constants.Pipe,' ')}";
                                                         }
                                                     }
                                                 }
