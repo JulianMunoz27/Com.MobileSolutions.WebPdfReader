@@ -73,106 +73,106 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             ///Put every page in a list to be able to search certain values
-            for (int page = 0; page < document.Pages.Count; page++)
-            {
-                var text = pages[page].ExtractText().Remove(0, 70);
-                RegexOptions options = RegexOptions.None;
-                Regex regex = new Regex("[ ]{2,}", options);
-                text = regex.Replace(text, "|");
-                pageList.Add(text);
+            //for (int page = 0; page < document.Pages.Count; page++)
+            //{
+            //    var text = pages[page].ExtractText().Remove(0, 70);
+            //    RegexOptions options = RegexOptions.None;
+            //    Regex regex = new Regex("[ ]{2,}", options);
+            //    text = regex.Replace(text, "|");
+            //    pageList.Add(text);
 
 
-                if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
-                {
-                    lastDetailPage = page;
-                    break;
-                }
-            }
+            //    if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
+            //    {
+            //        lastDetailPage = page;
+            //        break;
+            //    }
+            //}
 
 
-            //var text = pages[18015].ExtractText().Remove(0, 70);
-            //RegexOptions options = RegexOptions.None;
-            //Regex regex = new Regex("[ ]{2,}", options);
-            //text = regex.Replace(text, "|");
-            //pageList.Add(text);
+            var text = pages[7208].ExtractText().Remove(0, 70);
+            RegexOptions options = RegexOptions.None;
+            Regex regex = new Regex("[ ]{2,}", options);
+            text = regex.Replace(text, "|");
+            pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 18015));
+            detailList.Add(DetailPageReader(document, 7208));
 
-            foreach (var page in pageList)
-            {
-                if (page.Contains(Constants.OverviewM2M))//Overview of Machine to Machine Activity
-                {
-                    var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-                    detailList.Add(splittedPage);
-                }
+            //foreach (var page in pageList)
+            //{
+            //    if (page.Contains(Constants.OverviewM2M))//Overview of Machine to Machine Activity
+            //    {
+            //        var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+            //        detailList.Add(splittedPage);
+            //    }
 
-                //
-                if (!page.Contains(Constants.QuickBillSummary) && (page.Contains(Constants.AccountMonthlyCharges) || page.Contains(Constants.AccountChargesAndCreditsContinue) ||
-                    page.Contains(Constants.AccountChargesAndCredits) || page.Contains(Constants.PaymentsAdjustments) || page.Contains(Constants.PaymentsAdjustmentsContinue) ||
-                    page.Contains(Constants.AdjustmentsContinued)))//Overview of Machine to Machine Activity
-                {
-                    var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-                    detailList.Add(splittedPage);
-                }
+            //    //
+            //    if (!page.Contains(Constants.QuickBillSummary) && (page.Contains(Constants.AccountMonthlyCharges) || page.Contains(Constants.AccountChargesAndCreditsContinue) ||
+            //        page.Contains(Constants.AccountChargesAndCredits) || page.Contains(Constants.PaymentsAdjustments) || page.Contains(Constants.PaymentsAdjustmentsContinue) ||
+            //        page.Contains(Constants.AdjustmentsContinued)))//Overview of Machine to Machine Activity
+            //    {
+            //        var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+            //        detailList.Add(splittedPage);
+            //    }
 
-                ///Realize if the page is a detail page or not
-                if (page.Contains(Constants.OverviewOfLines) || page.Contains(Constants.OverviewOfVoice))
-                {
-                    var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToArray();
-                    var index = GetDetailsArrayPosition(splittedPage);
-                    var lineRegex = new Regex(Constants.DetailsRegex);
-                    for (int line = index; line <= splittedPage.Length - 1; line++)
-                    {
-                        //validates if the line is a detail or a cost center 
-                        if (splittedPage[line].Split('|').Length > 2)
-                        {
+            //    ///Realize if the page is a detail page or not
+            //    if (page.Contains(Constants.OverviewOfLines) || page.Contains(Constants.OverviewOfVoice))
+            //    {
+            //        var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToArray();
+            //        var index = GetDetailsArrayPosition(splittedPage);
+            //        var lineRegex = new Regex(Constants.DetailsRegex);
+            //        for (int line = index; line <= splittedPage.Length - 1; line++)
+            //        {
+            //            //validates if the line is a detail or a cost center 
+            //            if (splittedPage[line].Split('|').Length > 2)
+            //            {
 
-                            var indexValue = splittedPage[line];
-                            if (lineRegex.IsMatch(indexValue))
-                            {
-                                var indexRegex = new Regex(Constants.IndexRegex2).Match(indexValue);
-                                //TODO: some lines are bugged and doesn't contains the "|" before the page number so i have to ignore them until solved
-                                if (indexRegex.Success)//if (int.TryParse(splittedPage[line].Split('|')[2], out int n))
-                                {
-                                    var indexGroup = indexRegex.Groups;
-                                    if (!string.IsNullOrEmpty(indexGroup[5].ToString()))
-                                    {
-                                        previousPage = Convert.ToInt32(Convert.ToInt64(indexGroup[5].ToString()) > document.Pages.Count ? indexGroup[5].ToString().Substring(indexGroup[5].ToString().Length - previousPage.ToString().Length) : indexGroup[5].ToString());
-                                        if (previousPage != 0)
-                                        {
-                                            detailList.Add(DetailPageReader(document, previousPage));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var valueRegex = new Regex(Constants.IndexRegex3).Match(indexGroup[2].ToString());
-                                        if (valueRegex.Success)
-                                        {
-                                            previousPage = Convert.ToInt32(Convert.ToInt32(valueRegex.Value) > document.Pages.Count ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
-                                            if (previousPage != 0)
-                                            {
-                                                detailList.Add(DetailPageReader(document, previousPage));
-                                            }
+            //                var indexValue = splittedPage[line];
+            //                if (lineRegex.IsMatch(indexValue))
+            //                {
+            //                    var indexRegex = new Regex(Constants.IndexRegex2).Match(indexValue);
+            //                    //TODO: some lines are bugged and doesn't contains the "|" before the page number so i have to ignore them until solved
+            //                    if (indexRegex.Success)//if (int.TryParse(splittedPage[line].Split('|')[2], out int n))
+            //                    {
+            //                        var indexGroup = indexRegex.Groups;
+            //                        if (!string.IsNullOrEmpty(indexGroup[5].ToString()))
+            //                        {
+            //                            previousPage = Convert.ToInt32(Convert.ToInt64(indexGroup[5].ToString()) > document.Pages.Count ? indexGroup[5].ToString().Substring(indexGroup[5].ToString().Length - previousPage.ToString().Length) : indexGroup[5].ToString());
+            //                            if (previousPage != 0)
+            //                            {
+            //                                detailList.Add(DetailPageReader(document, previousPage));
+            //                            }
+            //                        }
+            //                        else
+            //                        {
+            //                            var valueRegex = new Regex(Constants.IndexRegex3).Match(indexGroup[2].ToString());
+            //                            if (valueRegex.Success)
+            //                            {
+            //                                previousPage = Convert.ToInt32(Convert.ToInt32(valueRegex.Value) > document.Pages.Count ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
+            //                                if (previousPage != 0)
+            //                                {
+            //                                    detailList.Add(DetailPageReader(document, previousPage));
+            //                                }
 
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine(splittedPage[line]);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine(splittedPage[line]);
-                                    errorCount++;
-                                    buggedStrings.Add(splittedPage[line]);
-                                }
-                            }
-                        }
+            //                            }
+            //                            else
+            //                            {
+            //                                Console.WriteLine(splittedPage[line]);
+            //                            }
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+            //                        Console.WriteLine(splittedPage[line]);
+            //                        errorCount++;
+            //                        buggedStrings.Add(splittedPage[line]);
+            //                    }
+            //                }
+            //            }
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
 
             return detailList;
         }
@@ -1195,6 +1195,38 @@ namespace Com.MobileSolutions.Application.Helpers
                     usgsumDetail.SP_INV_RECORD_TYPE = type;
                     usgsumDetail.INFO_ONLY_IND = "N";
 
+                }
+            }
+            else
+            {
+                var internationDataSpecialCaseRegex = new Regex(Constants.InternationDataSpecialCaseRegex).Match(dataValues);
+
+                if (internationDataSpecialCaseRegex.Success)
+                {
+
+                    usgsumDetail = new DetailDto();
+                    var internationDataRegexGroup = internationDataSpecialCaseRegex.Groups;
+
+                    var used = Convert.ToInt32(internationDataRegexGroup[2].ToString()) * Convert.ToDecimal(internationDataRegexGroup[4].ToString());
+                    
+                    usgsumDetail.UNIQ_ID = Constants.USGSUM;
+                    usgsumDetail.CHG_CLASS = Constants.LevelOne;
+                    usgsumDetail.ACCT_LEVEL = accountNumber.Replace(Constants.Hyphen, string.Empty);
+                    usgsumDetail.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                    usgsumDetail.SP_NAME = mrcDataSpName.TrimStart();
+                    usgsumDetail.SUBSCRIBER = serviceId;
+
+                    usgsumDetail.CHG_CODE_1 = internationDataRegexGroup[1].ToString().Replace(Constants.Pipe, ' ');
+                    usgsumDetail.CHG_QTY1_ALLOWED = "0";
+                    usgsumDetail.CHG_QTY1_TYPE = internationDataRegexGroup[6].ToString().ToLower();
+                    usgsumDetail.CHG_QTY1_USED = Utils.NumberFormat(used.ToString());
+                    usgsumDetail.CHG_QTY1_BILLED = Utils.NumberFormat(used.ToString());
+                    usgsumDetail.CHG_AMT = Utils.NumberFormat(internationDataRegexGroup[8].ToString().Replace(Constants.MoneySign, string.Empty));
+
+                    usgsumDetail.CURRENCY = Constants.USD;
+                    usgsumDetail.SHARE_IND = share ? "True" : string.Empty;
+                    usgsumDetail.SP_INV_RECORD_TYPE = type;
+                    usgsumDetail.INFO_ONLY_IND = "N";
                 }
             }
 

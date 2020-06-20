@@ -788,36 +788,51 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                 else
                                                 {
 
-                                                    var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
 
-                                                    if (internationalVoiceRegex.Success)
+                                                    if (new Regex(Constants.InternationDataSpecialCaseRegex).IsMatch(detailValues))
                                                     {
+                                                        var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
 
-                                                        var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
-
-                                                        usgsumData.UNIQ_ID = Constants.USGSUM;
-                                                        usgsumData.CHG_CLASS = Constants.LevelOne;
-                                                        usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                                                        usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                                        usgsumData.SP_NAME = mrcDataSpName.TrimStart();
-                                                        usgsumData.SUBSCRIBER = serviceId;
-                                                        usgsumData.CHG_CODE_1 = internationalVoiceRegexGroup[2].ToString().Replace(Constants.Pipe, ' ');
-
-                                                        usgsumData.CHG_AMT = Utils.NumberFormat(internationalVoiceRegexGroup[3].ToString().Replace(Constants.MoneySign, string.Empty));
-                                                        usgsumData.CURRENCY = Constants.USD;
-                                                        usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
-
-                                                        usgsumResult.Add(usgsumData);
-
-                                                        this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
+                                                        if (usgsumDetail != null)
+                                                        {
+                                                            usgsumResult.Add(usgsumDetail);
+                                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        if (!detailValues.Contains("Usage While"))
+                                                        var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
+
+                                                        if (internationalVoiceRegex.Success)
                                                         {
-                                                            planName = $"{planName} {detailValues.Replace(Constants.Pipe,' ')}";
+
+                                                            var internationalVoiceRegexGroup = internationalVoiceRegex.Groups;
+
+                                                            usgsumData.UNIQ_ID = Constants.USGSUM;
+                                                            usgsumData.CHG_CLASS = Constants.LevelOne;
+                                                            usgsumData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                                            usgsumData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                                            usgsumData.SP_NAME = mrcDataSpName.TrimStart();
+                                                            usgsumData.SUBSCRIBER = serviceId;
+                                                            usgsumData.CHG_CODE_1 = internationalVoiceRegexGroup[2].ToString().Replace(Constants.Pipe, ' ');
+
+                                                            usgsumData.CHG_AMT = Utils.NumberFormat(internationalVoiceRegexGroup[3].ToString().Replace(Constants.MoneySign, string.Empty));
+                                                            usgsumData.CURRENCY = Constants.USD;
+                                                            usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
+
+                                                            usgsumResult.Add(usgsumData);
+
+                                                            this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
+                                                        }
+                                                        else
+                                                        {
+                                                            if (!detailValues.Contains("Usage While"))
+                                                            {
+                                                                planName = $"{planName} {detailValues.Replace(Constants.Pipe, ' ')}";
+                                                            }
                                                         }
                                                     }
+                                                    
                                                 }
                                             }
                                         }

@@ -136,6 +136,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string InternationalMessageRegex = @"([^\|]*)\|?(messages( sent| rcvd)?)( unlimited)?(\|(([0-9]*,)?[0-9]*|\-\-))?\|(([0-9]*,)?[0-9]*|\-\-)\|(([0-9]*,)?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationVoiceRegex = @"(|[^\|]+\|)([^\|]{2}[^\|]+|[^\|]+\|\d{2}\/\d{2})\|(-?\$?(\d|\,|\.)+)$";
         public static string InternationDataRegex = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)( unlimited)?((\||\s)(([0-9]+,){0,2}[0-9]+\.?[0-9]*|\-\-))?\|(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
+        public static string InternationDataSpecialCaseRegex = @"\|?([^\|]+ - (\d+) at \$ (\d+)\/(([0-9]+,)?[0-9]*\.?[0-9]*) (GB|MB|KB) (\d{1,2}\/\d{1,2} - \d{1,2}\/\d{1,2}))\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationalMinutesRegex = @"([^\|]*)\|?(minutes|calls)( unlimited)?(\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string UsageVoiceRegex = @"([^\|]+)\|(minutes|calls)( unlimited)?(\|[0-9]*|\|--)?\|([0-9]*)\|([0-9]*|--)\|(\-?\$?[0-9]*\.[0-9]*|\-\-)$";
         public static string HeaderRegex = @"Bill Date\|([aA-zZ]* [0-9]{2}, [0-9]{4})";
