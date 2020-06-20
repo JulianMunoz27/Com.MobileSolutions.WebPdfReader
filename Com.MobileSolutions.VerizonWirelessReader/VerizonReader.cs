@@ -711,22 +711,28 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 {
                                     var firstdetail = pageContent.FirstOrDefault(d => d.Contains(Constants.InternationTitle));
                                     var detailPosArray = Array.IndexOf(detailArray, firstdetail);
+                                    var removedText = helper.RemoveLeftSide(detailArray[detailPosArray + 1]);
 
-                                    while (!detailArray[detailPosArray + 1].Contains(Constants.TotaInternational))
+                                    var planName = "";
+                                    while (!removedText.Contains(Constants.TotaInternational))
                                     {//Total Voice
 
-
-                                        var detailValues = detailArray[detailPosArray + 1];
+                                        removedText = helper.RemoveLeftSide(detailArray[detailPosArray + 1]);
+                                        var detailValues = removedText;
                                         DetailDto usgsumData = new DetailDto();
 
 
+                                        
                                         if (new Regex(Constants.InternationalMessageRegex).IsMatch(detailValues))
                                         {
 
-                                            var messagingValuesInter = helper.GetMessaging(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
+                                            var messagingValuesInter = helper.GetMessaging(removedText, mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
 
                                             if (messagingValuesInter != null)
                                             {
+                                                messagingValuesInter.CHG_CODE_1 = this.CheckInternationEspecialCase(planName,messagingValuesInter.CHG_CODE_1);
+                                                planName = messagingValuesInter.CHG_CODE_1;
+
                                                 usgsumResult.Add(messagingValuesInter);
                                                 this.lineTotal += System.Convert.ToDecimal(messagingValuesInter.CHG_AMT);
                                             }
@@ -741,6 +747,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                                 if (usgsumDetail != null)
                                                 {
+                                                    usgsumDetail.CHG_CODE_1 = this.CheckInternationEspecialCase(planName, usgsumDetail.CHG_CODE_1);
+                                                    planName = usgsumDetail.CHG_CODE_1;
+
                                                     usgsumResult.Add(usgsumDetail);
                                                     this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                                 }
@@ -763,14 +772,17 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                     usgsumData.SUBSCRIBER = serviceId;
 
                                                     usgsumData.CHG_CODE_1 = internationMinutesRegexGroup[1].ToString().Replace(Constants.Pipe, ' ');
-                                                    usgsumData.CHG_QTY1_ALLOWED = internationMinutesRegexGroup[3].ToString().Contains("unlimited") ? "" : internationMinutesRegexGroup[5].ToString();
                                                     usgsumData.CHG_QTY1_TYPE = Utils.GetChargesType(internationMinutesRegexGroup[2].ToString());
-                                                    usgsumData.CHG_QTY1_USED = internationMinutesRegexGroup[6].ToString().Replace(Constants.Hyphen, string.Empty);
-                                                    usgsumData.CHG_QTY1_BILLED = internationMinutesRegexGroup[7].ToString().Replace(Constants.Hyphen, string.Empty).Equals(string.Empty) ? "0" : internationMinutesRegexGroup[7].ToString();
-                                                    usgsumData.CHG_AMT = Utils.NumberFormat(internationMinutesRegexGroup[8].ToString().Replace(Constants.Hyphen, string.Empty).Replace(Constants.MoneySign, string.Empty));
+                                                    usgsumData.CHG_QTY1_ALLOWED = internationMinutesRegexGroup[3].ToString().Contains("unlimited") ? "" : internationMinutesRegexGroup[5].ToString();
+                                                    usgsumData.CHG_QTY1_USED = internationMinutesRegexGroup[7].ToString().Contains("--") || string.IsNullOrEmpty(internationMinutesRegexGroup[7].ToString()) ? "" : Utils.NumberFormat(internationMinutesRegexGroup[7].ToString());
+                                                    usgsumData.CHG_QTY1_BILLED = internationMinutesRegexGroup[9].ToString().Contains("--") || string.IsNullOrEmpty(internationMinutesRegexGroup[9].ToString()) ? "" : Utils.NumberFormat(internationMinutesRegexGroup[9].ToString());
+                                                    usgsumData.CHG_AMT = internationMinutesRegexGroup[11].ToString().Contains("--")? "": Utils.NumberFormat(internationMinutesRegexGroup[11].ToString().Replace(Constants.MoneySign, string.Empty));
 
                                                     usgsumData.CURRENCY = Constants.USD;
                                                     usgsumData.SP_INV_RECORD_TYPE = Constants.INTERNATIONAL;
+
+                                                    usgsumData.CHG_CODE_1 = this.CheckInternationEspecialCase(planName, usgsumData.CHG_CODE_1);
+                                                    planName = usgsumData.CHG_CODE_1;
 
                                                     usgsumResult.Add(usgsumData);
 
@@ -802,9 +814,18 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                                         this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
                                                     }
+                                                    else
+                                                    {
+                                                        if (!removedText.Contains("Usage While"))
+                                                        {
+                                                            planName = $"{planName} {removedText.Replace(Constants.Pipe,' ')}";
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
+                                        
+                                        
 
                                         if (detailPosArray + 1 == detailArray.Length - 1)
                                         {
@@ -926,7 +947,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             //***************************************************************************************************************************************************
                             //******************************************************** Total Current Charges For ****************************************************************
                             //***************************************************************************************************************************************************
-
+                            pageNumber++;
                             if (!string.IsNullOrEmpty(totalCurrentChargesFor))
                             {
 
@@ -952,7 +973,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 result.Add(mrcTotal);
                             }
-                            pageContent = helper.getPageContent(pageNumber++);
+                            pageContent = helper.getPageContent(pageNumber);
                         }
                         while (totalCurrentChargesFor == null) ;
 
@@ -1286,7 +1307,6 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             return result;
         }
 
-
         private DetailDto GetAccountUsage(string dataValues, string mrcDataSpName, string serviceId, string type)
         {
 
@@ -1315,7 +1335,21 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             return accountData;
         }
 
+        private string CheckInternationEspecialCase(string currentPlanName, string structurePlanName)
+        {
+            var planName = structurePlanName;
+            if (string.IsNullOrEmpty(structurePlanName.Trim())) {
+                planName = currentPlanName;
+            }
 
+            var dateRegex = new Regex(Constants.DateRegex).Match(structurePlanName);
+            if (dateRegex.Success)
+            {
+                planName = $"{currentPlanName} {structurePlanName}";
+            }
+
+            return planName;
+        }
 
         private DetailDto GetEquipmentCharges(string dataValues, string mrcDataSpName, string serviceId)
         {
