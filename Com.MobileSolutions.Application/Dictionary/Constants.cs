@@ -29,7 +29,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string AccountChargesAndCreditsContinue = "Account Charges and Credits, continued";
         public static string MonthlyCharges = "Monthly Charges";
         public static string YourPlan = "Your Plan";
-        public static string YourPlanMonthlyCharges = "Your Plan|Monthly Charges";
+        public static string YourPlanMonthlyCharges = "Your Plan|%@Monthly Charges";
         public static string TotalCurrentChargesFor = "Total Current Charges for";
         public static string AccountMonthlyCharges = "Account Monthly Charges";
         public static string AccountUsageCharges = "Account Usage Charges";
@@ -110,7 +110,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string UsgPurchesCharges2 = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)((\||\s)unlimited)?((\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?(\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,){0,2}[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)*[0-9]*\.[0-9]*|\-\-)$";
 
         public static string UsgPurchesCharges1 = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)( unlimited)?((\||\s)(([0-9]+,){0,2}[0-9]+\.?[0-9]*|\-\-))?\|(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
-
+        public static string DateRegex = @"\d{1,2}\/\d{1,2} - \d{1,2}\/\d{1,2}";
         public static string AdjustmentRegex = @"^(\||)([^\|]+)\|(-?(\d|\,|\.)*)$";
         public static string AdjustmentRegex1 = @"^(\||)(([^\|]+)\|(\d*\s?)?(for (\d{3}\-\d{3}\-\d{4})\s?)?on (\d{1,2}\/\d{1,2}\/\d{2}))\|(-?(\d|\,|\.)*)$";
         public static string AdjustmentRegex2 = @"^(\||)(([^\|]+) (\d{3}\-\d{3}\-\d{4})?(\s)?on (\d{1,2}\/\d{1,2}\/\d{2}))\|(-?(\d|\,|\.)*)$";
@@ -134,7 +134,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string InternationalMessageRegex = @"([^\|]*)\|?(messages( sent| rcvd)?)( unlimited)?(\|(([0-9]*,)?[0-9]*|\-\-))?\|(([0-9]*,)?[0-9]*|\-\-)\|(([0-9]*,)?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationVoiceRegex = @"(|[^\|]+\|)([^\|]{2}[^\|]+|[^\|]+\|\d{2}\/\d{2})\|(-?\$?(\d|\,|\.)+)$";
         public static string InternationDataRegex = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)( unlimited)?((\||\s)(([0-9]+,){0,2}[0-9]+\.?[0-9]*|\-\-))?\|(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
-        public static string InternationalMinutesRegex = @"([^\|]*)\|?(minutes|calls)( unlimited)?(\|([0-9]*\.?[0-9]*|\-\-))?\|([0-9]*\.?[0-9]*|\-\-)\|([0-9]*\.?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
+        public static string InternationalMinutesRegex = @"([^\|]*)\|?(minutes|calls)( unlimited)?(\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string UsageVoiceRegex = @"([^\|]+)\|(minutes|calls)( unlimited)?(\|[0-9]*|\|--)?\|([0-9]*)\|([0-9]*|--)\|(\-?\$?[0-9]*\.[0-9]*|\-\-)$";
         public static string HeaderRegex = @"Bill Date\|([aA-zZ]* [0-9]{2}, [0-9]{4})";
         public static string NamingConventionRegex = @"[0-9]*_[^_]*_([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{2}-[0-9]{2}-[0-9]{4})_[0-9]+\.pdf";

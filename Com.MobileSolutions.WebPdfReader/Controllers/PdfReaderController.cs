@@ -45,8 +45,8 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
         [HttpPost]
         public void Post(PathValues pathValues)
         {
-            try
-            {
+            /*try
+            {*/
                 logger.Trace($"start processing file:{pathValues.Path} at {DateTime.Now.ToString("yyyy/MM/dd-hh:mm:ss")}");
                 var fileName = Path.GetFileName(pathValues.Path);
 
@@ -77,13 +77,13 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                 //}
 
                 logger.Trace($"finished processing file:{pathValues.Path} at {DateTime.Now.ToString("yyyy/MM/dd-hh:mm:ss")}");
-            }
+            /*}
             catch (Exception ex)
             {
                 var fileName = Path.GetFileName(pathValues.Path);
                 System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
                 logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
-            }
+            }*/
         }
     }
 }
