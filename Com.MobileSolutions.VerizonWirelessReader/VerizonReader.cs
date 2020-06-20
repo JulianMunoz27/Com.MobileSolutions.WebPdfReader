@@ -709,10 +709,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 {
                                     var firstdetail = pageContent.FirstOrDefault(d => d.Contains(Constants.InternationTitle));
                                     var detailPosArray = Array.IndexOf(detailArray, firstdetail);
-                                    var removedText = helper.RemoveLeftSide(detailArray[detailPosArray + 1]);
 
-                                    var planName = "";
-                                    while (!removedText.Contains(Constants.TotaInternational))
+                                    var planName = string.Empty;
+                                    while (!helper.RemoveLeftSide(detailArray[detailPosArray + 1]).Contains(Constants.TotaInternational))
                                     {//Total Voice
 
 
@@ -814,9 +813,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                     }
                                                     else
                                                     {
-                                                        if (!removedText.Contains("Usage While"))
+                                                        if (!detailValues.Contains("Usage While"))
                                                         {
-                                                            planName = $"{planName} {removedText.Replace(Constants.Pipe,' ')}";
+                                                            planName = $"{planName} {detailValues.Replace(Constants.Pipe,' ')}";
                                                         }
                                                     }
                                                 }

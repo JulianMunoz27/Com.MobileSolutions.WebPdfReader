@@ -32,6 +32,12 @@ namespace Com.MobileSolutions.Application.Dictionary
                 case "messages":
                     chargeCode = Constants.ChargesType_MSG;
                     break;
+                case "messages sent":
+                    chargeCode = Constants.ChargesType_MSG;
+                    break;
+                case "messages rcvd":
+                    chargeCode = Constants.ChargesType_MSG;
+                    break;
                 default:
                     chargeCode = string.Empty;
                     break;
