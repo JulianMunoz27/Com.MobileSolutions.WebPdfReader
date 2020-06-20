@@ -438,10 +438,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var occPosArray = Array.IndexOf(detailArray, firstOcc);
 
                                 var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
-
-                                var removedText = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
-
-                                while (!finalValueRegex.IsMatch(removedText.Split(Constants.Pipe)[removedText.Split(Constants.Pipe).Length - 1]))
+                                planName = planName.Replace("%@", string.Empty);
+                                while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
                                     var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
                                     DetailDto usgsumDetail = new DetailDto();
@@ -501,10 +499,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges));
                                 var occStartPosArray = Array.IndexOf(detailArray, firstOcc);
 
-
-                                while (!moneyRegex.IsMatch(detailArray[occStartPosArray + 1].Split(Constants.Pipe)[detailArray[occStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                                while (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {
-                                    DetailDto equipment = this.GetEquipmentCharges(detailArray[occStartPosArray + 1], mrcDataSpName, serviceId);
+                                    DetailDto equipment = this.GetEquipmentCharges(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]), mrcDataSpName, serviceId);
 
                                     if (equipment != null)
                                         occResult.Add(equipment);
@@ -527,16 +524,16 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 if (!string.IsNullOrEmpty(voiceFind))
                                 {
                                     var firstdetail = pageContent.FirstOrDefault(d => d.Contains(Constants.VoiceTitle));
-                                    var detailPosArray = Array.IndexOf(detailArray, firstdetail);
-
+                                    var detailPosArray = Array.IndexOf(detailArray, firstdetail);                                    
 
                                     while (!detailArray[detailPosArray + 1].Contains(Constants.TotalVoice))
                                     {//Total Voice
 
-                                        var shared = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
+                                        var removedText = helper.RemoveLeftSide(detailArray[detailPosArray + 1]);
+                                        var shared = ((detailPosArray + 1 < detailArray.Length && removedText.Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && helper.RemoveLeftSide(detailArray[detailPosArray + 2]).Contains("(shared)") && helper.RemoveLeftSide(detailArray[detailPosArray + 2]).Split(Constants.Pipe).Length < 3)) ? true : false;
 
 
-                                        DetailDto voiceTemp = helper.GetVoice(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, this.accountNumber, shared);
+                                        DetailDto voiceTemp = helper.GetVoice(removedText, mrcDataSpName, serviceId, this.accountNumber, shared);
 
                                         if (voiceTemp != null)
                                         {
@@ -572,8 +569,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     while (!detailArray[values + 1].Contains(Constants.TotalMessaging))
                                     {//Total Voice
 
-
-                                        var messagingValues = helper.GetMessaging(detailArray[values + 1], mrcDataSpName, serviceId, accountNumber, Constants.MESSAGING);
+                                        var removedText = helper.RemoveLeftSide(detailArray[values + 1]);
+                                        var messagingValues = helper.GetMessaging(removedText, mrcDataSpName, serviceId, accountNumber, Constants.MESSAGING);
 
                                         if (messagingValues != null)
                                         {
@@ -606,8 +603,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     while (!detailArray[dataStartPosArray + 1].Contains(Constants.TotalData))
                                     {//Total Voice
 
-                                        var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
-                                        var usgsumDetail = helper.GetData(detailArray[dataStartPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber, Constants.DATA);
+                                        var removedText = helper.RemoveLeftSide(detailArray[dataStartPosArray + 1]);
+                                        var share = ((dataStartPosArray + 1 < detailArray.Length && removedText.Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && helper.RemoveLeftSide(detailArray[dataStartPosArray + 2]).Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && helper.RemoveLeftSide(detailArray[dataStartPosArray + 3]).Contains("(shared)"))) ? true : false;
+                                        var usgsumDetail = helper.GetData(removedText, mrcDataSpName, serviceId, share, this.accountNumber, Constants.DATA);
 
 
                                         if (usgsumDetail != null)
@@ -638,11 +636,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     var detailPosArray = Array.IndexOf(detailArray, firstdetail);
 
                                     //while (!detailArray[detailPosArray + 1].Contains(Constants.TotalPurchases))
-                                    while (!finalValueRegex.IsMatch(detailArray[detailPosArray + 1].Split(Constants.Pipe)[detailArray[detailPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                                    while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[detailPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[detailPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                     {
 
 
-                                        var detailValues = helper.GetPurchases(detailArray[detailPosArray + 1], this.accountNumber, mrcDataSpName, serviceId, dateDueMonth, dateDueYear);
+                                        var detailValues = helper.GetPurchases(helper.RemoveLeftSide(detailArray[detailPosArray + 1]), this.accountNumber, mrcDataSpName, serviceId, dateDueMonth, dateDueYear);
 
                                         if (detailValues != null)
                                         {
@@ -678,7 +676,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     {//Total Voice
 
                                         //var share = ((dataStartPosArray + 1 < detailArray.Length && detailArray[dataStartPosArray + 1].Contains("(shared)")) || (dataStartPosArray + 2 < detailArray.Length && detailArray[dataStartPosArray + 2].Contains("(shared)")) || (dataStartPosArray + 3 < detailArray.Length && detailArray[dataStartPosArray + 3].Contains("(shared)"))) ? true : false;
-                                        var share = ((detailPosArray + 1 < detailArray.Length && detailArray[detailPosArray + 1].Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && detailArray[detailPosArray + 2].Contains("(shared)") && detailArray[detailPosArray + 2].Split(Constants.Pipe).Length < 3)) ? true : false;
+                                        var share = ((detailPosArray + 1 < detailArray.Length && helper.RemoveLeftSide(detailArray[detailPosArray + 1]).Contains("(shared)")) || (detailPosArray + 2 < detailArray.Length && helper.RemoveLeftSide(detailArray[detailPosArray + 2]).Contains("(shared)") && helper.RemoveLeftSide(detailArray[detailPosArray + 2]).Split(Constants.Pipe).Length < 3)) ? true : false;
 
                                         DetailDto usgsumDetail = helper.GetRoaming(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, share, this.accountNumber);
 
@@ -713,14 +711,14 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     {//Total Voice
 
 
-                                        var detailValues = detailArray[detailPosArray + 1];
+                                        var detailValues = helper.RemoveLeftSide(detailArray[detailPosArray + 1]);
                                         DetailDto usgsumData = new DetailDto();
 
 
                                         if (new Regex(Constants.InternationalMessageRegex).IsMatch(detailValues))
                                         {
 
-                                            var messagingValuesInter = helper.GetMessaging(detailArray[detailPosArray + 1], mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
+                                            var messagingValuesInter = helper.GetMessaging(detailValues, mrcDataSpName, serviceId, accountNumber, Constants.INTERNATIONAL);
 
                                             if (messagingValuesInter != null)
                                             {
@@ -825,11 +823,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var firstOtherCharges = pageContent.FirstOrDefault(d => d.Contains(Constants.OtherChargesCredits));
                                 var firstOtherChargesStartPosArray = Array.IndexOf(detailArray, firstOtherCharges);
 
-
-                                while (!moneyRegex.IsMatch(detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe)[detailArray[firstOtherChargesStartPosArray + 1].Split(Constants.Pipe).Length - 1]))
+                                while (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[firstOtherChargesStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[firstOtherChargesStartPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {
 
-                                    var usgsumDetail = helper.GetOtherChargesCredits(detailArray[firstOtherChargesStartPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
+                                    var usgsumDetail = helper.GetOtherChargesCredits(helper.RemoveLeftSide(detailArray[firstOtherChargesStartPosArray + 1]), mrcDataSpName, serviceId, this.accountNumber);
 
 
                                     if (usgsumDetail != null)
@@ -864,11 +861,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             //***************************************************************************************************************************************************************************
                             if (!string.IsNullOrEmpty(firstSurcharges))
                             {
-                                while (!finalValueRegex.IsMatch(detailArray[surPosArray + 1].Split(Constants.Pipe)[detailArray[surPosArray + 1].Split(Constants.Pipe).Length - 1]) && !detailArray[surPosArray + 1].Contains(Constants.OtherChargesCredits))
+
+                                while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[surPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[surPosArray + 1]).Split(Constants.Pipe).Length - 1]) && !helper.RemoveLeftSide(detailArray[surPosArray + 1]).Contains(Constants.OtherChargesCredits))
                                 {//Total Voice
 
 
-                                    var usgsumDetail = helper.GetSurcharges(detailArray[surPosArray + 1], mrcDataSpName, serviceId, this.accountNumber);
+                                    var usgsumDetail = helper.GetSurcharges(helper.RemoveLeftSide(detailArray[surPosArray + 1]), mrcDataSpName, serviceId, this.accountNumber);
 
                                     if (usgsumDetail != null)
                                     {
@@ -897,10 +895,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 int values = taxesPosArray;
 
-                                while (!finalValueRegex.IsMatch(detailArray[values + 1].Split(Constants.Pipe)[detailArray[values + 1].Split(Constants.Pipe).Length - 1]))
+                                while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[values + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[values + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
 
-                                    var surValues = helper.GetTaxesGovermentalSurcharges(detailArray[values + 1], accountNumber, mrcDataSpName, serviceId);
+                                    var surValues = helper.GetTaxesGovermentalSurcharges(helper.RemoveLeftSide(detailArray[values + 1]), accountNumber, mrcDataSpName, serviceId);
 
                                     if (surValues != null)
                                     {
@@ -975,9 +973,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                         while (!detailArray[firstM2mIndex + 1].Contains(Constants.TotalCurrentChargesM2M))
                         {
-
-                            var dataValues = detailArray[firstM2mIndex + 1];
-                            var dataValueArray = detailArray[firstM2mIndex + 1].Split(Constants.Pipe);
+                            var dataValues = helper.RemoveLeftSide(detailArray[firstM2mIndex + 1]);
+                            var dataValueArray = dataValues.Split(Constants.Pipe);
                             if (dataValueArray.Length >= 4)
                             {
 
@@ -985,7 +982,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 if (matchName.Success && !dataValues.Contains(Constants.Subtotal))
                                 {
-                                    M2MPlanName = matchName.Groups[1].ToString();
+                                    M2MPlanName = matchName.Groups[1].ToString().Replace("%@", string.Empty);
                                     //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
 
 
