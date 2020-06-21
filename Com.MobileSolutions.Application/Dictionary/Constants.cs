@@ -152,7 +152,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string BillDateRegex = @"(\|?)(Bill Date\|)([A-z\s\-0-9\,]+)";
         public static string QuickBillSummaryDateRegex = @"(\|?)(Quick Bill Summary\|)([A-z\s\-0-9\,]+)";
         public static string DueDateRegex = @"([^\|]+)(\|[^\|]+)([\s|\|])(\d{1,2}\/\d{1,2}\/\d{1,2})";
-        public static string LineSeparatorRegex = @"";
+        public static string LineSeparatorRegex = @"([^%@]+%@)";
         //*******************************************************************************************************************
 
         public static string Voice = "Voice";

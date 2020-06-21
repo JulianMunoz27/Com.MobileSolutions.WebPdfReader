@@ -90,13 +90,17 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
+
             //var text = pages[7208].ExtractText().Remove(0, 70);
+
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
+
             //detailList.Add(DetailPageReader(document, 7208));
+
 
             foreach (var page in pageList)
             {
@@ -1417,9 +1421,7 @@ namespace Com.MobileSolutions.Application.Helpers
 
         public string RemoveLeftSide(string line)
         {
-            var cutRegex = new Regex(@".*(?=%@)");
-            var convertedLine = cutRegex.Match(line).Value;
-            return !string.IsNullOrEmpty(convertedLine) ? line.Replace(convertedLine, string.Empty).Replace(Constants.LineSeparator, string.Empty) : line.Replace(Constants.LineSeparator, string.Empty);
+            return line.Contains("%@") ? line : line.Substring(line.IndexOf("%@") + 2);
         }
     }
 }
