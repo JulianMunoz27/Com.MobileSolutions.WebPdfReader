@@ -331,12 +331,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             {
                 var detailArray = detail.ToArray();
 
-                Console.WriteLine(detail[1]);
-
-
                 var spNameChecker = detail.FirstOrDefault(p => p.Contains(Constants.SummaryFor));
-
-
 
                 var accountMonthlyChargesSum = System.Convert.ToDecimal(0.0);
 
@@ -507,7 +502,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     DetailDto equipment = this.GetEquipmentCharges(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]), mrcDataSpName, serviceId);
 
                                     if (equipment != null)
+                                    {
                                         occResult.Add(equipment);
+                                        this.lineTotal += System.Convert.ToDecimal(equipment.CHG_AMT);
+                                    }
+                                        
 
                                     occStartPosArray++;
                                 }
@@ -826,14 +825,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                         }
                                                         else
                                                         {
-<<<<<<< HEAD
+
                                                             if (!detailValues.Contains("Usage While"))
                                                             {
                                                                 planName = $"{planName} {detailValues.Replace(Constants.Pipe, ' ')}";
                                                             }
-=======
-                                                            planName = $"{planName.Trim()} {detailValues.Trim().Replace(Constants.Pipe,' ')}";
->>>>>>> master
+
                                                         }
                                                     }
                                                     
