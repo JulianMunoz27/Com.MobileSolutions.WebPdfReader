@@ -27,6 +27,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
         private int dateDueYear;
         private string invoiceNumber;
         private decimal lineTotal = System.Convert.ToDecimal(0.0);
+        private decimal accountTotal = System.Convert.ToDecimal(0.0);
         private decimal reconciliationValue = 0;
         private string acctType = string.Empty;
         private PdfDocument document;
@@ -960,7 +961,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             //***************************************************************************************************************************************************
                             //******************************************************** Total Current Charges For ****************************************************************
                             //***************************************************************************************************************************************************
-                            pageNumber++;
+                          
                             if (!string.IsNullOrEmpty(totalCurrentChargesFor))
                             {
 
