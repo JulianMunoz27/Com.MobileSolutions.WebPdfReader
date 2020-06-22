@@ -31,6 +31,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
         private decimal reconciliationValue = 0;
         private string acctType = string.Empty;
         private PdfDocument document;
+        private List<String> noReconciledLine = new List<String>();
 
         /// <summary>
         /// Verizon Reader class constructor.
@@ -323,6 +324,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             var occResult = new List<DetailDto>();
             var adjAccountResult = new List<DetailDto>();
             var adjResult = new List<DetailDto>();
+            
             var moneyRegex = new Regex(Constants.OnlyMoneyRegex);
             var finalValueRegex = new Regex(Constants.FinalValueRegex);
             var currentSection = "";
@@ -420,6 +422,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         /*
                          Through the follow do - while we get the number of pages that a line detail has.
                          */
+                        this.accountTotal = 0;
                         var pageContent = detail;
                         do
                         {
@@ -480,6 +483,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
 
                                         this.lineTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
+                                        this.accountTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
 
                                         result.Add(mrcData);
                                     }
@@ -505,7 +509,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     if (equipment != null)
                                     {
                                         occResult.Add(equipment);
-                                        this.lineTotal += System.Convert.ToDecimal(equipment.CHG_AMT);
+                                        this.accountTotal += System.Convert.ToDecimal(equipment.CHG_AMT);
+                                        //this.lineTotal += System.Convert.ToDecimal(equipment.CHG_AMT);
                                     }
                                         
 
@@ -541,6 +546,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         if (voiceTemp != null)
                                         {
                                             this.lineTotal += System.Convert.ToDecimal(voiceTemp.CHG_AMT);
+                                            this.accountTotal += System.Convert.ToDecimal(voiceTemp.CHG_AMT);
                                             usgsumResult.Add(voiceTemp);
                                         }
 
@@ -579,6 +585,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         {
                                             usgsumResult.Add(messagingValues);
                                             this.lineTotal += System.Convert.ToDecimal(messagingValues.CHG_AMT);
+                                            this.accountTotal += System.Convert.ToDecimal(messagingValues.CHG_AMT);
                                         }
 
 
@@ -615,6 +622,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         {
                                             usgsumResult.Add(usgsumDetail);
                                             this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                         }
 
 
@@ -649,6 +657,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         {
                                             occResult.Add(detailValues);
                                             this.lineTotal += System.Convert.ToDecimal(detailValues.CHG_AMT);
+                                            this.accountTotal += System.Convert.ToDecimal(detailValues.CHG_AMT);
                                         }
 
                                         if (detailPosArray + 1 == detailArray.Length - 1)
@@ -687,6 +696,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         {
                                             usgsumResult.Add(usgsumDetail);
                                             this.lineTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
+                                            this.accountTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
                                         }
 
 
@@ -732,6 +742,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                                 usgsumResult.Add(messagingValuesInter);
                                                 this.lineTotal += System.Convert.ToDecimal(messagingValuesInter.CHG_AMT);
+                                                this.accountTotal += System.Convert.ToDecimal(messagingValuesInter.CHG_AMT);
                                             }
                                         }
                                         else
@@ -749,6 +760,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                                     usgsumResult.Add(usgsumDetail);
                                                     this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                    this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                                 }
                                             }
                                             else
@@ -784,6 +796,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                     usgsumResult.Add(usgsumData);
 
                                                     this.lineTotal += !string.IsNullOrEmpty(usgsumData.CHG_AMT) ? System.Convert.ToDecimal(usgsumData.CHG_AMT) : 0;
+                                                    this.accountTotal += !string.IsNullOrEmpty(usgsumData.CHG_AMT) ? System.Convert.ToDecimal(usgsumData.CHG_AMT) : 0;
                                                 }
                                                 else
                                                 {
@@ -797,6 +810,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                         {
                                                             usgsumResult.Add(usgsumDetail);
                                                             this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                                         }
                                                     }
                                                     else
@@ -823,6 +837,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                             usgsumResult.Add(usgsumData);
 
                                                             this.lineTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
+                                                            this.accountTotal += System.Convert.ToDecimal(usgsumData.CHG_AMT);
                                                         }
                                                         else
                                                         {
@@ -873,6 +888,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     {
                                         usgsumResult.Add(usgsumDetail);
                                         this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                        this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                     }
 
                                     if (firstOtherChargesStartPosArray + 1 == detailArray.Length - 1)
@@ -915,6 +931,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         surTaxesResult.Add(usgsumDetail);
 
                                         this.lineTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
+                                        this.accountTotal += System.Convert.ToDecimal(usgsumDetail.CHG_AMT);
                                     }
 
 
@@ -945,6 +962,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     if (surValues != null)
                                     {
                                         surTaxesResult.Add(surValues);
+                                        this.accountTotal += System.Convert.ToDecimal(surValues.CHG_AMT);
                                         this.lineTotal += System.Convert.ToDecimal(surValues.CHG_AMT);
                                     }
 
@@ -986,6 +1004,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 mrcTotal.UDF = "";
 
                                 result.Add(mrcTotal);
+
+                                if(System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) != this.accountTotal)
+                                {
+                                    noReconciledLine.Add(serviceId);
+                                }
+                                
                             }
                             pageNumber++;
                             pageContent = helper.getPageContent(pageNumber);
@@ -1731,6 +1755,20 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         }
                     }
                 }
+
+                if (this.noReconciledLine.Count > 0)
+                {
+                    var lineWithError = $@"{outPutPath}\Error_{file.SP_FILENAME.Replace(".txt", string.Empty)}_no_reconciled.txt";
+                    using (StreamWriter sw = File.CreateText(lineWithError))
+                    {
+                        foreach (var line in noReconciledLine)
+                        {
+                            sw.WriteLine(line);
+                        }
+                    }
+                }
+
+
                 var zipName = $@"{outPutPath}\MSSPDF_{file.SP_FILENAME.Replace(".txt", ".zip")}";
 
                 using (ZipFile zip = new ZipFile())
