@@ -358,7 +358,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         var yourPlanWord = detail.FirstOrDefault(d => d.Contains(Constants.YourPlan));
                         var yourPlanWordArray = Array.IndexOf(detailArray, yourPlanWord);
 
-                        var planName = detailArray[yourPlanWordArray + 1].Contains("Plan from") ? detailArray[yourPlanWordArray + 2].Split(Constants.Pipe)[0] : detailArray[yourPlanWordArray + 1];
+                        var planName = helper.RemoveLeftSide(detailArray[yourPlanWordArray + 1].Contains("Plan from") ? detailArray[yourPlanWordArray + 2].Split(Constants.Pipe)[0] : detailArray[yourPlanWordArray + 1]);
 
 
                         DetailDto mrcData = new DetailDto();
