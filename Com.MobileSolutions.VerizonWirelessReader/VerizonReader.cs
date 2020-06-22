@@ -986,6 +986,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 result.Add(mrcTotal);
                             }
+                            pageNumber++;
                             pageContent = helper.getPageContent(pageNumber);
                         }
                         while (totalCurrentChargesFor == null) ;
