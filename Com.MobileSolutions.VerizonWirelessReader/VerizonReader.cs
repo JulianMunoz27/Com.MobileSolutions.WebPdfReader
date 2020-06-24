@@ -324,7 +324,6 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             var occResult = new List<DetailDto>();
             var adjAccountResult = new List<DetailDto>();
             var adjResult = new List<DetailDto>();
-
             var moneyRegex = new Regex(Constants.OnlyMoneyRegex);
             var finalValueRegex = new Regex(Constants.FinalValueRegex);
             var currentSection = "";
@@ -979,7 +978,6 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             //***************************************************************************************************************************************************
                             //******************************************************** Total Current Charges For ****************************************************************
                             //***************************************************************************************************************************************************
-
                             if (!string.IsNullOrEmpty(totalCurrentChargesFor))
                             {
 
@@ -1005,7 +1003,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 result.Add(mrcTotal);
 
-                                if (System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) != this.accountTotal)
+                                if(System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) != this.accountTotal)
                                 {
                                     noReconciledLine.Add(serviceId);
                                 }
