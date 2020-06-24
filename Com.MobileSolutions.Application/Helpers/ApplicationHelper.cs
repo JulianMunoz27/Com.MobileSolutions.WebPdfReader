@@ -229,7 +229,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 
                 if (len > 57 && lineCount > firstYourPlan)
                 {
-                    var lineWithChars = line.Insert(57, Constants.LineSeparator);
+                    var lineWithChars = line.Insert(52, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
                     formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
