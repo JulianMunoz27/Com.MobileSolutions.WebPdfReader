@@ -221,13 +221,14 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             var lineCount = 0;
-            var firstYourPlan = Array.IndexOf(page.ToArray(), Constants.RawYourPlanMonthlyCharges);
+            var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan) && p.Contains(Constants.MonthlyCharges));
+            var firstYourPlan = Array.IndexOf(page.ToArray(), YourPlan);
 
             foreach (var line in page)
             {
                 var len = line.Length;
                 
-                if (len > 57 && lineCount > firstYourPlan)
+                if (len > 52 && lineCount > firstYourPlan)
                 {
                     var lineWithChars = line.Insert(52, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
