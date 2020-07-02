@@ -360,9 +360,16 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         var yourPlanWord = detail.FirstOrDefault(d => d.Contains(Constants.YourPlan));
                         var yourPlanWordArray = Array.IndexOf(detailArray, yourPlanWord);
 
-                        var planName = helper.RemoveLeftSide(detailArray[yourPlanWordArray + 1].Contains("Plan from") ? detailArray[yourPlanWordArray + 2].Split(Constants.Pipe)[0] : detailArray[yourPlanWordArray + 1]);
+                        var planName = "";
+                        do
+                        {
 
-
+                            planName = detailArray[yourPlanWordArray + 1];
+                            yourPlanWordArray++;
+                        }
+                        while (string.IsNullOrEmpty(planName));
+                        
+                        
                         DetailDto mrcData = new DetailDto();
 
 
@@ -372,8 +379,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
                         mrcData.SP_NAME = mrcDataSpName.TrimStart();
                         mrcData.SUBSCRIBER = serviceId;
-                        mrcData.CHG_CODE_1 = planName;
-                        mrcData.CHG_CODE_2 = planName;
+                        mrcData.CHG_CODE_1 = planName.Remove(planName.Length-2);
+                        mrcData.CHG_CODE_2 = planName.Remove(planName.Length - 2);
                         mrcData.CHG_QTY1_BILLED = "0";
 
                         mrcData.CHG_AMT = "0";
