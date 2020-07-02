@@ -126,6 +126,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string DevicePaymentChargeRegex = @"([^\|]+\|)?(Device Payment Buyout Charge \(\d{1,3} - \d{1,3}\) Agreement \d*)\|(\-?([0-9]+,)*[0-9]*(\.[0-9]*))$";
         public static string VoiceRegex = @"([^\|][^\|]+)\|(\-?[0-9]*\.[0-9]{1,2})";
         public static string BroadbandRegex = @"^\|(([^\|]+) (\d{1,2}\/\d{1,2}\/\d{1,2}))\|(-?\$?(\d|\,|\.)*)$";
+        public static string LicenseRegex = @"\|?([^\|]+ License(s)? @\s\-?\$?([0-9]*,)?[0-9]*\.[0-9]*\son\s(\d{1,2}\/\d{1,2}\/\d{2}))\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)$";
         public static string DetailForRegex = @"^Detail\sfor\s([^:]+):\s(\d{3}\-\d{3}\-\d{4})$";
         public static string SurchargesRegex = @"([^\|]*\|)?([^\|]*)\|(\-?[0-9]*(\.[0-9]*))$";
         public static string SurchargesRegex2 = @"([^\|]*\|)?([^\|]*(\||\s)\d* of \d*)\|(\-?[0-9]*(\.[0-9]*))$";

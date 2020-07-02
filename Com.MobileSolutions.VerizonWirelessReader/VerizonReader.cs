@@ -885,7 +885,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                     if (usgsumDetail != null)
                                     {
-                                        usgsumResult.Add(usgsumDetail);
+                                        occResult.Add(usgsumDetail);
                                         this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                         this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                     }
@@ -1211,45 +1211,36 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             }
                             else
                             {
-                                if (!detailArray[firstAccountMonthlyIndex + 1].Contains(Constants.Subtotal))
+                                var licenseRegex = new Regex(Constants.LicenseRegex).Match(detailArray[firstAccountMonthlyIndex + 1]);
+                                if (licenseRegex.Success)
                                 {
-                                    var accountLevenTaxRegex = new Regex(Constants.InternationVoiceRegex).Match(detailArray[firstAccountMonthlyIndex + 1]);
-                                    if (accountLevenTaxRegex.Success)
+                                    var licenseGroups = licenseRegex.Groups;
+
+                                    string planName = detailArray[firstAccountMonthlyIndex];//+ " " + 
+                                    DetailDto taxData = new DetailDto();
+
+                                    taxData.UNIQ_ID = Constants.OCC;
+                                    taxData.CHG_CLASS = Constants.LevelOne;
+                                    taxData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                    taxData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                    taxData.CHG_CODE_1 = licenseGroups[1].ToString().Replace('|', ' ').Trim();
+                                    taxData.CHG_CODE_2 = planName.Replace('|', ' ').Trim();
+                                    taxData.CHG_AMT = Utils.NumberFormat(licenseGroups[5].ToString().Replace(Constants.MoneySign, string.Empty));
+
+                                    taxData.CURRENCY = Constants.USD;
+                                    taxData.SP_INV_RECORD_TYPE = Constants.ACCOUNT_CHARGES;
+
+                                    occResult.Add(taxData);
+                                    this.lineTotal += System.Convert.ToDecimal(taxData.CHG_AMT);
+                                }
+                                else
+                                {
+                                    if (!detailArray[firstAccountMonthlyIndex + 1].Contains(Constants.Subtotal))
                                     {
-                                        var accountLevenTaxGroups = accountLevenTaxRegex.Groups;
-
-                                        DetailDto taxData = new DetailDto();
-
-                                        taxData.UNIQ_ID = Constants.TAX;
-                                        taxData.CHG_CLASS = Constants.LevelOne;
-                                        taxData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
-                                        taxData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                        taxData.CHG_CODE_1 = accountLevenTaxGroups[2].ToString().Replace('|', ' ');
-                                        taxData.CHG_AMT = Utils.NumberFormat(accountLevenTaxGroups[3].ToString().Replace(Constants.MoneySign, string.Empty));
-
-                                        taxData.CURRENCY = Constants.USD;
-                                        taxData.INFO_ONLY_IND = "N";
-                                        taxData.SP_INV_RECORD_TYPE = Constants.ACCOUNT_CHARGES;
-
-                                        surTaxesResult.Add(taxData);
-                                    }
-                                    else
-                                    {
-                                        var accountMonthlyRegex = new Regex(Constants.BroadbandRegex);
-                                        var dataValues = detailArray[firstAccountMonthlyIndex + 1];
-
-                                        if (accountMonthlyRegex.IsMatch(dataValues))
+                                        var accountLevenTaxRegex = new Regex(Constants.InternationVoiceRegex).Match(detailArray[firstAccountMonthlyIndex + 1]);
+                                        if (accountLevenTaxRegex.Success)
                                         {
-                                            var accountMonthly = accountMonthlyRegex.Match(dataValues).Groups;
-                                            var dataValueArray = detailArray[firstAccountMonthlyIndex + 1].Split(Constants.Pipe);
-
-
-                                            var begMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[0].Split('/')[0]);
-                                            var endMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[0]);
-
-                                            var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
-                                            var endYear = endMonth >= 1 && endMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
-
+                                            var accountLevenTaxGroups = accountLevenTaxRegex.Groups;
 
                                             DetailDto taxData = new DetailDto();
 
@@ -1257,20 +1248,55 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                             taxData.CHG_CLASS = Constants.LevelOne;
                                             taxData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
                                             taxData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                            taxData.CHG_CODE_1 = accountMonthly[1].ToString();
-                                            taxData.BEG_CHG_DATE = accountMonthly[3].ToString().Split('-').Length > 1 ? new DateTime(begYear, begMonth, Convert.ToInt32(accountMonthly[3].ToString().Split('-')[0].Split('/')[1])).ToString("M/d/yyyy") : string.Empty;
-                                            taxData.END_CHG_DATE = accountMonthly[3].ToString().Split('-').Length > 1 ? new DateTime(endYear, endMonth, Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[1])).ToString("M/d/yyyy") : string.Empty;
-                                            taxData.CHG_AMT = Utils.NumberFormat(accountMonthly[4].ToString().Replace(Constants.MoneySign, string.Empty));
+                                            taxData.CHG_CODE_1 = accountLevenTaxGroups[2].ToString().Replace('|', ' ');
+                                            taxData.CHG_AMT = Utils.NumberFormat(accountLevenTaxGroups[3].ToString().Replace(Constants.MoneySign, string.Empty));
 
                                             taxData.CURRENCY = Constants.USD;
                                             taxData.INFO_ONLY_IND = "N";
-                                            taxData.SP_INV_RECORD_TYPE = Constants.TaxesType;
+                                            taxData.SP_INV_RECORD_TYPE = Constants.ACCOUNT_CHARGES;
 
                                             surTaxesResult.Add(taxData);
+                                        }
+                                        else
+                                        {
+                                            var accountMonthlyRegex = new Regex(Constants.BroadbandRegex);
+                                            var dataValues = detailArray[firstAccountMonthlyIndex + 1];
 
+                                            if (accountMonthlyRegex.IsMatch(dataValues))
+                                            {
+                                                var accountMonthly = accountMonthlyRegex.Match(dataValues).Groups;
+                                                var dataValueArray = detailArray[firstAccountMonthlyIndex + 1].Split(Constants.Pipe);
+
+
+                                                var begMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[0].Split('/')[0]);
+                                                var endMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[0]);
+
+                                                var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                                                var endYear = endMonth >= 1 && endMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+
+
+                                                DetailDto taxData = new DetailDto();
+
+                                                taxData.UNIQ_ID = Constants.TAX;
+                                                taxData.CHG_CLASS = Constants.LevelOne;
+                                                taxData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                                taxData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                                taxData.CHG_CODE_1 = accountMonthly[1].ToString();
+                                                taxData.BEG_CHG_DATE = accountMonthly[3].ToString().Split('-').Length > 1 ? new DateTime(begYear, begMonth, Convert.ToInt32(accountMonthly[3].ToString().Split('-')[0].Split('/')[1])).ToString("M/d/yyyy") : string.Empty;
+                                                taxData.END_CHG_DATE = accountMonthly[3].ToString().Split('-').Length > 1 ? new DateTime(endYear, endMonth, Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[1])).ToString("M/d/yyyy") : string.Empty;
+                                                taxData.CHG_AMT = Utils.NumberFormat(accountMonthly[4].ToString().Replace(Constants.MoneySign, string.Empty));
+
+                                                taxData.CURRENCY = Constants.USD;
+                                                taxData.INFO_ONLY_IND = "N";
+                                                taxData.SP_INV_RECORD_TYPE = Constants.TaxesType;
+
+                                                surTaxesResult.Add(taxData);
+
+                                            }
                                         }
                                     }
                                 }
+                                
                             }
 
                             if (firstAccountMonthlyIndex + 1 == detailArray.Length - 1)
