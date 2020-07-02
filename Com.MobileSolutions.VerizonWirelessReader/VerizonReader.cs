@@ -885,7 +885,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                     if (usgsumDetail != null)
                                     {
-                                        usgsumResult.Add(usgsumDetail);
+                                        occResult.Add(usgsumDetail);
                                         this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                         this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                     }
@@ -1231,6 +1231,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     taxData.SP_INV_RECORD_TYPE = Constants.ACCOUNT_CHARGES;
 
                                     occResult.Add(taxData);
+                                    this.lineTotal += System.Convert.ToDecimal(taxData.CHG_AMT);
                                 }
                                 else
                                 {
