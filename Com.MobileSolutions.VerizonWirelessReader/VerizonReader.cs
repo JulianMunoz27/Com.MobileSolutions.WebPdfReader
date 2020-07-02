@@ -1216,14 +1216,15 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 {
                                     var licenseGroups = licenseRegex.Groups;
 
-                                    string planName = detailArray[firstAccountMonthlyIndex];//+ " " + licenseGroups[1].ToString()
+                                    string planName = detailArray[firstAccountMonthlyIndex];//+ " " + 
                                     DetailDto taxData = new DetailDto();
 
                                     taxData.UNIQ_ID = Constants.OCC;
                                     taxData.CHG_CLASS = Constants.LevelOne;
                                     taxData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
                                     taxData.ACCT_LEVEL_2 = Constants.VerizonWireless;
-                                    taxData.CHG_CODE_1 = planName.Replace('|', ' ').Trim();
+                                    taxData.CHG_CODE_1 = licenseGroups[1].ToString().Replace('|', ' ').Trim();
+                                    taxData.CHG_CODE_2 = planName.Replace('|', ' ').Trim();
                                     taxData.CHG_AMT = Utils.NumberFormat(licenseGroups[5].ToString().Replace(Constants.MoneySign, string.Empty));
 
                                     taxData.CURRENCY = Constants.USD;
