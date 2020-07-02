@@ -78,6 +78,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string TotalAmountTitle = "Total Amount";
         public static string OtherChargesCredits = "Other Charges and Credits";
         public static string RawYourPlanMonthlyCharges = "        Your Plan                                        Monthly Charges";
+        public static string BreakdownOfCharges = "Breakdown of Charges";
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************
         //*******************************************************************************************************************

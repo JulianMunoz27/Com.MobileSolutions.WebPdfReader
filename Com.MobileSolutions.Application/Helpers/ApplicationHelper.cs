@@ -98,13 +98,32 @@ namespace Com.MobileSolutions.Application.Helpers
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-
-            //detailList.Add(DetailPageReader(document, 7208));
-
-
-
             foreach (var page in pageList)
             {
+                if (page.Contains(Constants.BreakdownOfCharges))
+                {
+                    var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToArray();
+                    var index = GetBreakdownOfChargesArrayPosition(splittedPage);
+                    var lineRegex = new Regex(@"(pg\s\d+)");
+
+                    for (int line = index; line <= splittedPage.Length -1; line++)
+                    {
+                        var indexValue = splittedPage[line];
+                        if(lineRegex.IsMatch(indexValue) && !indexValue.Contains("Account Charges & Credits"))
+                        {
+                            var indexRegex = new Regex(@"\d+").Match(lineRegex.Match(indexValue).Value);
+                            if (indexRegex.Success)
+                            {
+                                detailList.Add(DetailPageReader(document, Convert.ToInt32(indexRegex.Value)));
+                            }
+                        }
+                        else if(indexValue.Contains("Total Current Charges"))
+                        {
+                            break;
+                        }
+                    }
+                }
+
                 if (page.Contains(Constants.OverviewM2M))//Overview of Machine to Machine Activity
                 {
                     var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -121,11 +140,12 @@ namespace Com.MobileSolutions.Application.Helpers
                 }
 
                 ///Realize if the page is a detail page or not
-                if (page.Contains(Constants.OverviewOfLines) || page.Contains(Constants.OverviewOfVoice))
+                if ((page.Contains(Constants.OverviewOfLines) || page.Contains(Constants.OverviewOfVoice)) && !page.Contains(Constants.BreakdownOfCharges))
                 {
                     var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToArray();
                     var index = GetDetailsArrayPosition(splittedPage);
                     var lineRegex = new Regex(Constants.DetailsRegex);
+
                     for (int line = index; line <= splittedPage.Length - 1; line++)
                     {
                         //validates if the line is a detail or a cost center 
@@ -178,6 +198,7 @@ namespace Com.MobileSolutions.Application.Helpers
                     }
                 }
             }
+            //}
 
             return detailList;
         }
@@ -211,6 +232,11 @@ namespace Com.MobileSolutions.Application.Helpers
             return Array.IndexOf(details, Constants.DetailColumns) + 1;
         }
 
+        public int GetBreakdownOfChargesArrayPosition(string[] details)
+        {
+            return Array.IndexOf(details, Constants.BreakdownOfCharges) + 1;
+        }
+
         public List<string> DetailPageReader(PdfDocument document, int pageNumber)
         {
             List<string> formattedPage = new List<string>();
@@ -227,7 +253,7 @@ namespace Com.MobileSolutions.Application.Helpers
             foreach (var line in page)
             {
                 var len = line.Length;
-                
+
                 if (len > 52 && lineCount > firstYourPlan)
                 {
                     var lineWithChars = line.Insert(52, Constants.LineSeparator);
@@ -1214,7 +1240,7 @@ namespace Com.MobileSolutions.Application.Helpers
                     var internationDataRegexGroup = internationDataSpecialCaseRegex.Groups;
 
                     var used = Convert.ToInt32(internationDataRegexGroup[2].ToString()) * Convert.ToDecimal(internationDataRegexGroup[4].ToString());
-                    
+
                     usgsumDetail.UNIQ_ID = Constants.USGSUM;
                     usgsumDetail.CHG_CLASS = Constants.LevelOne;
                     usgsumDetail.ACCT_LEVEL = accountNumber.Replace(Constants.Hyphen, string.Empty);
