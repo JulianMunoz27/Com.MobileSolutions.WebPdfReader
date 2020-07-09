@@ -91,12 +91,14 @@ namespace Com.MobileSolutions.Application.Helpers
 
 
 
-            //var text = pages[7208].ExtractText().Remove(0, 70);
+            //var text = pages[10545].ExtractText().Remove(0, 70);
 
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
+
+            //detailList.Add(DetailPageReader(document, Convert.ToInt32(10545)));
 
             foreach (var page in pageList)
             {
@@ -106,10 +108,10 @@ namespace Com.MobileSolutions.Application.Helpers
                     var index = GetBreakdownOfChargesArrayPosition(splittedPage);
                     var lineRegex = new Regex(@"(pg\s\d+)");
 
-                    for (int line = index; line <= splittedPage.Length -1; line++)
+                    for (int line = index; line <= splittedPage.Length - 1; line++)
                     {
                         var indexValue = splittedPage[line];
-                        if(lineRegex.IsMatch(indexValue) && !indexValue.Contains("Account Charges & Credits"))
+                        if (lineRegex.IsMatch(indexValue) && !indexValue.Contains("Account Charges & Credits"))
                         {
                             var indexRegex = new Regex(@"\d+").Match(lineRegex.Match(indexValue).Value);
                             if (indexRegex.Success)
@@ -117,7 +119,7 @@ namespace Com.MobileSolutions.Application.Helpers
                                 detailList.Add(DetailPageReader(document, Convert.ToInt32(indexRegex.Value)));
                             }
                         }
-                        else if(indexValue.Contains("Total Current Charges"))
+                        else if (indexValue.Contains("Total Current Charges"))
                         {
                             break;
                         }
@@ -198,7 +200,6 @@ namespace Com.MobileSolutions.Application.Helpers
                     }
                 }
             }
-            //}
 
             return detailList;
         }
@@ -248,18 +249,25 @@ namespace Com.MobileSolutions.Application.Helpers
 
             var lineCount = 0;
             var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan) && p.Contains(Constants.MonthlyCharges));
+            var containsMRC = page.FirstOrDefault(p => p.Contains(Constants.MonthlyCharges));
             var firstYourPlan = Array.IndexOf(page.ToArray(), YourPlan);
 
             foreach (var line in page)
             {
                 var len = line.Length;
 
-                if (len > 52 && lineCount > firstYourPlan)
+                if (len > 52 && lineCount > firstYourPlan && containsMRC != null)
                 {
                     var lineWithChars = line.Insert(52, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
                     formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
+                }
+                else if(lineCount > firstYourPlan && containsMRC == null)
+                {
+                    RegexOptions options = RegexOptions.None;
+                    Regex regex = new Regex("[ ]{2,}", options);
+                    formattedPage.Add(regex.Replace(line.TrimStart().TrimEnd(), "|"));
                 }
                 else
                 {
