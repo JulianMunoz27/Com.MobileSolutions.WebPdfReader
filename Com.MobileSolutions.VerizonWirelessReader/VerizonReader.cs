@@ -363,11 +363,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         var planName = "";
                         do
                         {
-
                             planName = detailArray[yourPlanWordArray + 1];
                             yourPlanWordArray++;
                         }
-                        while (string.IsNullOrEmpty(planName));
+                        while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom));
                         
                         
                         DetailDto mrcData = new DetailDto();
