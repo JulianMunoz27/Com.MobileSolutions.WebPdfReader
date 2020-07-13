@@ -53,22 +53,22 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                 //var headerRegex = new Regex(Constants.NamingConventionRegex).Match(fileName);
                 //if (headerRegex.Success)
                 //{
-                    document = new PdfDocument();
-                    helper = new ApplicationHelper();
-                    verizonReader = new VerizonReader(document, pathValues.Path);
-                    FileDto file = new FileDto();
-                    HeaderDto header = new HeaderDto();
-                    List<DetailDto> details = new List<DetailDto>();
-                    var preBuildText = helper.Prebuild(document, pathValues.Path);
-                    if (preBuildText.Any())
-                    {
-                        header = verizonReader.GetHeaderValues(preBuildText);
-                        file = verizonReader.GetFileValues(fileName);
-                        var detailList = helper.ReadDetails(document, pathValues.Path);
-                        details = verizonReader.GetDetailValues(detailList, document, pathValues.Path);
-                    }
+                document = new PdfDocument();
+                helper = new ApplicationHelper();
+                verizonReader = new VerizonReader(document, pathValues.Path);
+                FileDto file = new FileDto();
+                HeaderDto header = new HeaderDto();
+                List<DetailDto> details = new List<DetailDto>();
+                var preBuildText = helper.Prebuild(document, pathValues.Path);
+                if (preBuildText.Any())
+                {
+                    header = verizonReader.GetHeaderValues(preBuildText);
+                    file = verizonReader.GetFileValues(fileName);
+                    var detailList = helper.ReadDetails(document, pathValues.Path);
+                    details = verizonReader.GetDetailValues(detailList, document, pathValues.Path);
+                }
 
-                    verizonReader.PlainTextConstructor(file, header, details, pathValues.Path, pathValues.OutputPath, pathValues.ProcessedFilesPath);
+                verizonReader.PlainTextConstructor(file, header, details, pathValues.Path, pathValues.OutputPath, pathValues.ProcessedFilesPath);
                 //}
                 //else
                 //{
@@ -84,6 +84,6 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                 System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
                 logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
             }
-}
+        }
     }
 }

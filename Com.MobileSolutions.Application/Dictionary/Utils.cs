@@ -134,7 +134,7 @@ namespace Com.MobileSolutions.Application.Dictionary
             date = date.Trim();
             var day = Convert.ToInt32(date.Split(" ")[1].Replace(",", string.Empty));
             var month = DateTime.ParseExact(date.Split(" ")[0], date.Split(" ")[0].Length < 4 ? "MMM" : "MMMM", CultureInfo.CurrentCulture).Month;
-            var year = date.Split(" ").Length > 2 && date.Split(" ")[2] != string.Empty ? Convert.ToInt32(date.Split(" ")[2]) : 1901;
+            var year = date.Split(" ").Length > 2 && date.Split(" ")[2] != string.Empty ? Convert.ToInt32(date.Split(" ")[2]) : DateTime.Now.Year;
             return new DateTime(year, month, day).ToString();
         }
 
