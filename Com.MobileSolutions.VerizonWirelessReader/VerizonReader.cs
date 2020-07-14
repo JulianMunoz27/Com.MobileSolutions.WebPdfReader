@@ -378,8 +378,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
                         mrcData.SP_NAME = mrcDataSpName.TrimStart();
                         mrcData.SUBSCRIBER = serviceId;
-                        mrcData.CHG_CODE_1 = planName.Remove(planName.Length-2);
-                        mrcData.CHG_CODE_2 = planName.Remove(planName.Length - 2);
+                        mrcData.CHG_CODE_1 = planName.Replace(Constants.LineSeparator, string.Empty);
+                        mrcData.CHG_CODE_2 = planName.Replace(Constants.LineSeparator, string.Empty);
                         mrcData.CHG_QTY1_BILLED = "0";
 
                         mrcData.CHG_AMT = "0";
