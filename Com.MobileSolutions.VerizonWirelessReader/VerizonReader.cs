@@ -444,8 +444,18 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
                                 var occPosArray = Array.IndexOf(detailArray, firstOcc);
                                 var emptyMRCFlag = true;
-                                var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
-                                planName = planName.Replace(Constants.LineSeparator, string.Empty);
+
+                                var yourPlanWord = detail.FirstOrDefault(d => d.Contains(Constants.YourPlan));
+                                var yourPlanWordArray = Array.IndexOf(detailArray, yourPlanWord);
+                                var planName = "";
+                                do
+                                {
+                                    planName = detailArray[yourPlanWordArray + 1];
+                                    yourPlanWordArray++;
+                                }
+                                while (string.IsNullOrEmpty(planName.Split(Constants.LineSeparator)[0]) || planName.Split(Constants.LineSeparator)[0].Contains(Constants.PlanFrom));
+
+                                planName = planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0];
                                 while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
                                     var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
