@@ -443,7 +443,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             {
                                 var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
                                 var occPosArray = Array.IndexOf(detailArray, firstOcc);
-
+                                var emptyMRCFlag = true;
                                 var planName = detailArray[occPosArray + 2].Contains("Plan from") ? detailArray[occPosArray + 3].Split(Constants.Pipe)[0] : detailArray[occPosArray + 2].Split(Constants.Pipe)[0];
                                 planName = planName.Replace(Constants.LineSeparator, string.Empty);
                                 while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
@@ -456,7 +456,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                     if (monthlyChargesRegex.IsMatch(mrcValues))
                                     {
-
+                                        emptyMRCFlag = false;
                                         var voiceGroup = monthlyChargesRegex.Match(mrcValues).Groups;
 
                                         var date = mrcValues.Split(Constants.Pipe).Length == 3 ? mrcValues.Split(Constants.Pipe)[1] : mrcValues.Split(Constants.Pipe)[2];
@@ -493,7 +493,28 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         result.Add(mrcData);
                                     }
 
+
                                     occPosArray++;
+                                }
+
+                                if (emptyMRCFlag)
+                                {
+                                    DetailDto mrcData = new DetailDto();
+
+                                    mrcData.UNIQ_ID = Constants.MRC;
+                                    mrcData.CHG_CLASS = Constants.LevelOne;
+                                    mrcData.ACCT_LEVEL = this.accountNumber.Replace(Constants.Hyphen, string.Empty);
+                                    mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
+                                    mrcData.SP_NAME = mrcDataSpName.TrimStart();
+                                    mrcData.SUBSCRIBER = serviceId;
+                                    mrcData.CHG_CODE_1 = planName;
+                                    mrcData.CHG_CODE_2 = planName;
+                                    mrcData.CHG_AMT = "0.00";
+                                    mrcData.CURRENCY = Constants.USD;
+                                    mrcData.INFO_ONLY_IND = "N";
+                                    mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
+
+                                    result.Add(mrcData);
                                 }
                             }
 
