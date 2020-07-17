@@ -451,11 +451,17 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 do
                                 {
                                     planName = detailArray[yourPlanWordArray + 1];
-                                    yourPlanWordArray++;
+
+                                    if (string.IsNullOrEmpty(planName.Split(Constants.LineSeparator)[0]) && Convert.ToDouble(detailArray[yourPlanWordArray + 1].Split(Constants.Pipe)[detailArray[yourPlanWordArray + 1].Split(Constants.Pipe).Length - 1]) >= 0)
+                                    {
+                                        break;
+                                    }
+
+                                    yourPlanWordArray++;                                    
                                 }
                                 while (string.IsNullOrEmpty(planName.Split(Constants.LineSeparator)[0]) || planName.Split(Constants.LineSeparator)[0].Contains(Constants.PlanFrom));
 
-                                planName = planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0];
+                                planName = !string.IsNullOrEmpty(planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0]) ? planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0] : planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[1];
                                 while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
                                     var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);

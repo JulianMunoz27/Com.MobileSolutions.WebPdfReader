@@ -89,8 +89,6 @@ namespace Com.MobileSolutions.Application.Helpers
                 }
             }
 
-
-
             //var text = pages[30833].ExtractText().Remove(0, 70);
 
             //RegexOptions options = RegexOptions.None;
@@ -98,7 +96,7 @@ namespace Com.MobileSolutions.Application.Helpers
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 869));
+            //detailList.Add(DetailPageReader(document, 10888));
 
             foreach (var page in pageList)
             {
@@ -196,7 +194,6 @@ namespace Com.MobileSolutions.Application.Helpers
                                 }
                             }
                         }
-
                     }
                 }
             }
