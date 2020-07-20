@@ -450,18 +450,16 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var planName = "";
                                 do
                                 {
-                                    planName = detailArray[yourPlanWordArray + 1];
+                                    var nameRegex = new Regex(Constants.LineSeparatorRegex).Match(detailArray[yourPlanWordArray + 1]);
 
-                                    if (string.IsNullOrEmpty(planName.Split(Constants.LineSeparator)[0]) && Convert.ToDouble(detailArray[yourPlanWordArray + 1].Split(Constants.Pipe)[detailArray[yourPlanWordArray + 1].Split(Constants.Pipe).Length - 1]) >= 0)
-                                    {
-                                        break;
-                                    }
+                                    planName = nameRegex.Groups[1].ToString().Replace(Constants.StringPipe, string.Empty);
 
                                     yourPlanWordArray++;                                    
                                 }
-                                while (string.IsNullOrEmpty(planName.Split(Constants.LineSeparator)[0]) || planName.Split(Constants.LineSeparator)[0].Contains(Constants.PlanFrom));
+                                while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom));
 
-                                planName = !string.IsNullOrEmpty(planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0]) ? planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[0] : planName.Replace(Constants.LineSeparator, string.Empty).Split(Constants.Pipe)[1];
+                                var isFirst = true;
+
                                 while (!finalValueRegex.IsMatch(helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occPosArray + 1]).Split(Constants.Pipe).Length - 1]))
                                 {//Total Voice
                                     var mrcValues = helper.RemoveLeftSide(detailArray[occPosArray + 1]);
@@ -472,6 +470,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                     if (monthlyChargesRegex.IsMatch(mrcValues))
                                     {
+
+                                        
                                         emptyMRCFlag = false;
                                         var voiceGroup = monthlyChargesRegex.Match(mrcValues).Groups;
 
@@ -479,10 +479,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                         DetailDto mrcData = new DetailDto();
 
-                                        if (planName.Equals(string.Empty))
+                                        if (isFirst)
                                         {
-                                            planName = voiceGroup[3].ToString();
+                                            planName = Convert.ToDouble(voiceGroup[8].ToString()) > 0 ? voiceGroup[3].ToString() : planName;
+                                            isFirst = false;
                                         }
+
 
                                         var begYear = Convert.ToInt32(voiceGroup[4].ToString()) >= 1 && Convert.ToInt32(voiceGroup[4].ToString()) <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
 
