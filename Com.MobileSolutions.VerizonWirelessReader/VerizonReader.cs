@@ -366,7 +366,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             planName = detailArray[yourPlanWordArray + 1];
                             yourPlanWordArray++;
                         }
-                        while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom));
+                        while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom) || planName.Equals(Constants.RequirementsNotMet));
                         
                         
                         DetailDto mrcData = new DetailDto();
@@ -846,18 +846,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                 {
 
 
-                                                    if (new Regex(Constants.InternationDataSpecialCaseRegex).IsMatch(detailValues))
-                                                    {
-                                                        var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
-
-                                                        if (usgsumDetail != null)
-                                                        {
-                                                            usgsumResult.Add(usgsumDetail);
-                                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                                        }
-                                                    }
-                                                    else
+                                                    if (new Regex(Constants.InternationVoiceRegex).IsMatch(detailValues))
                                                     {
                                                         var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
 
@@ -891,6 +880,18 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                                 planName = $"{planName} {detailValues.Replace(Constants.Pipe, ' ')}";
                                                             }
 
+                                                        }
+                                                       
+                                                    }
+                                                    else
+                                                    {
+                                                        var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
+
+                                                        if (usgsumDetail != null)
+                                                        {
+                                                            usgsumResult.Add(usgsumDetail);
+                                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                                         }
                                                     }
 

@@ -80,6 +80,8 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string RawYourPlanMonthlyCharges = "        Your Plan                                        Monthly Charges";
         public static string BreakdownOfCharges = "Breakdown of Charges";
         public static string PlanFrom = "Plan from";
+        public static string RequirementsNotMet = "of the requirements was not met.";
+
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************
         //*******************************************************************************************************************
