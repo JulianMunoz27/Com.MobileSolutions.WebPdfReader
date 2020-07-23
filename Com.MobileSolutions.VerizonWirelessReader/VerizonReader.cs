@@ -363,7 +363,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         var planName = "";
                         do
                         {
-                            planName = detailArray[yourPlanWordArray + 1];
+                            planName = detailArray[yourPlanWordArray + 1].Contains(Constants.LineSeparator) ? detailArray[yourPlanWordArray + 1].Split(Constants.LineSeparator)[0] : detailArray[yourPlanWordArray + 1];
                             yourPlanWordArray++;
                         }
                         while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom) || planName.Equals(Constants.RequirementsNotMet));

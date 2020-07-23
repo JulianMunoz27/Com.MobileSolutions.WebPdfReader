@@ -89,14 +89,8 @@ namespace Com.MobileSolutions.Application.Helpers
                 }
             }
 
-            //var text = pages[30833].ExtractText().Remove(0, 70);
 
-            //RegexOptions options = RegexOptions.None;
-            //Regex regex = new Regex("[ ]{2,}", options);
-            //text = regex.Replace(text, "|");
-            //pageList.Add(text);
-
-            //detailList.Add(DetailPageReader(document, 191));
+            //detailList.Add(DetailPageReader(document, 31));
 
             foreach (var page in pageList)
             {
@@ -245,22 +239,21 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             var lineCount = 0;
-            var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan) && p.Contains(Constants.MonthlyCharges));
-            var containsMRC = page.FirstOrDefault(p => p.Contains(Constants.MonthlyCharges));
+            var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan));
             var firstYourPlan = Array.IndexOf(page.ToArray(), YourPlan);
 
             foreach (var line in page)
             {
                 var len = line.Length;
 
-                if (len > 52 && lineCount > firstYourPlan && containsMRC != null)
+                if (len > 52 && lineCount > firstYourPlan)
                 {
                     var lineWithChars = line.Insert(52, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
                     formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
                 }
-                else if(lineCount > firstYourPlan && containsMRC == null)
+                else if(lineCount > firstYourPlan)
                 {
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
