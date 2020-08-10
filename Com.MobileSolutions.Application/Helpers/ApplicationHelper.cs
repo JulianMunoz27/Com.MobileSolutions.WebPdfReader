@@ -90,7 +90,7 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
 
-            //detailList.Add(DetailPageReader(document, 31));
+            //detailList.Add(DetailPageReader(document, 150));
 
             foreach (var page in pageList)
             {
