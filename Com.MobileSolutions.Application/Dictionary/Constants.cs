@@ -113,7 +113,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string NumberRegex = @"\d+";
         public static string AccountMonthlyRegex = @"^(\||)([^\|]+)(\||\s)(\d{1,2}\/\d{1,2} - \d{1,2}\/\d{1,2})\|(-?(\d|\,|\.)*)$";
 
-        public static string UsgPurchesCharges2 = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)((\||\s)unlimited)?((\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?(\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,){0,2}[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)*[0-9]*\.[0-9]*|\-\-)(\|[*]*)?$";
+        public static string UsgPurchesCharges2 = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)((\||\s)unlimited)?((\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?(\||\s)(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,){0,2}[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)*[0-9]*\.[0-9]*|\-\-|[*]*)?$";
 
         public static string UsgPurchesCharges1 = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)( unlimited)?((\||\s)(([0-9]+,){0,2}[0-9]+\.?[0-9]*|\-\-))?\|(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string DateRegex = @"\d{1,2}\/\d{1,2} - \d{1,2}\/\d{1,2}";

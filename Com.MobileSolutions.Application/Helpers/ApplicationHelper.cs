@@ -468,7 +468,7 @@ namespace Com.MobileSolutions.Application.Helpers
                     usgsumDetail.CHG_QTY1_TYPE = Utils.GetChargesType(internationDataRegexGroup[2].ToString());
                     usgsumDetail.CHG_QTY1_USED = internationDataRegexGroup[10].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[10].ToString().Replace(",", string.Empty));
                     usgsumDetail.CHG_QTY1_BILLED = internationDataRegexGroup[13].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[13].ToString().Equals(string.Empty) ? "0" : internationDataRegexGroup[13].ToString().Replace(",", string.Empty));
-                    usgsumDetail.CHG_AMT = internationDataRegexGroup[16].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[16].ToString().Replace(Constants.MoneySign, string.Empty));
+                    usgsumDetail.CHG_AMT = internationDataRegexGroup[16].ToString().Contains("--") | internationDataRegexGroup[16].ToString().Contains("**") ? "0" : Utils.NumberFormat(internationDataRegexGroup[16].ToString().Replace(Constants.MoneySign, string.Empty));
 
                     usgsumDetail.CURRENCY = Constants.USD;
                     usgsumDetail.SHARE_IND = share ? "True" : string.Empty;
