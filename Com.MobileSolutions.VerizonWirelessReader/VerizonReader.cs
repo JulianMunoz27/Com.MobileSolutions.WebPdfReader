@@ -1762,7 +1762,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
         }
 
 
-        public void PlainTextConstructor(FileDto file, HeaderDto header, List<DetailDto> details, string sourcePath, string outPutPath, string processedFilesPath)
+        public void PlainTextConstructor(FileDto file, HeaderDto header, List<DetailDto> details, string sourcePath, string outPutPath, string processedFilesPath, string outPutErrorPath)
         {
             lock (this)
             {
@@ -1827,9 +1827,12 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     }
                 }
 
+                var lineWithError = string.Empty;
+                var zipName = $@"{outPutPath}\MSSPDF_{file.SP_FILENAME.Replace(".txt", ".zip")}";
+
                 if (this.noReconciledLine.Count > 0)
                 {
-                    var lineWithError = $@"{outPutPath}\Error_{file.SP_FILENAME.Replace(".txt", string.Empty)}_no_reconciled.txt";
+                    lineWithError = $@"{outPutPath}\Error_{file.SP_FILENAME.Replace(".txt", string.Empty)}_no_reconciled.txt";
                     using (StreamWriter sw = File.CreateText(lineWithError))
                     {
                         foreach (var line in noReconciledLine)
@@ -1837,16 +1840,21 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             sw.WriteLine(line);
                         }
                     }
+
+
+                    zipName = $@"{outPutErrorPath}\MSSPDF_{file.SP_FILENAME.Replace(".txt", ".zip")}";
                 }
 
 
-                var zipName = $@"{outPutPath}\MSSPDF_{file.SP_FILENAME.Replace(".txt", ".zip")}";
 
                 using (ZipFile zip = new ZipFile())
                 {
                     zip.CompressionLevel = Ionic.Zlib.CompressionLevel.BestCompression;
                     zip.AddFile(path, "");
                     zip.AddFile(sourcePath, "");
+                    if (this.noReconciledLine.Count > 0)
+                        zip.AddFile(lineWithError, "");
+                    
                     zip.Save(zipName);
                 }
 
@@ -1857,7 +1865,22 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     File.Delete($@"{processedFilesPath}\{sourceFileName}");
                 }
 
-                File.Move(sourcePath, $@"{processedFilesPath}\{sourceFileName}");
+                if (File.Exists($@"{outPutErrorPath}\{sourceFileName}"))
+                {
+                    File.Delete($@"{outPutErrorPath}\{sourceFileName}");
+                }
+
+
+                if (this.noReconciledLine.Count > 0)
+                {
+                    File.Move(sourcePath, $@"{outPutErrorPath}\{sourceFileName}");
+                    File.Delete(lineWithError);
+                }
+                else
+                {
+                    File.Move(sourcePath, $@"{processedFilesPath}\{sourceFileName}");
+                }
+
                 File.Delete(path);
             }
         }

@@ -68,7 +68,7 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                     details = verizonReader.GetDetailValues(detailList, document, pathValues.Path);
                 }
 
-                verizonReader.PlainTextConstructor(file, header, details, pathValues.Path, pathValues.OutputPath, pathValues.ProcessedFilesPath);
+                verizonReader.PlainTextConstructor(file, header, details, pathValues.Path, pathValues.OutputPath, pathValues.ProcessedFilesPath, pathValues.FailedFiles);
                 //}
                 //else
                 //{
