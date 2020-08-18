@@ -73,21 +73,21 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             ///Put every page in a list to be able to search certain values
-            //for (int page = 0; page < document.Pages.Count; page++)
-            //{
-            //    var text = pages[page].ExtractText().Remove(0, 70);
-            //    RegexOptions options = RegexOptions.None;
-            //    Regex regex = new Regex("[ ]{2,}", options);
-            //    text = regex.Replace(text, "|");
-            //    pageList.Add(text);
+            for (int page = 0; page < document.Pages.Count; page++)
+            {
+                var text = pages[page].ExtractText().Remove(0, 70);
+                RegexOptions options = RegexOptions.None;
+                Regex regex = new Regex("[ ]{2,}", options);
+                text = regex.Replace(text, "|");
+                pageList.Add(text);
 
 
-            //    if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
-            //    {
-            //        lastDetailPage = page;
-            //        break;
-            //    }
-            //}
+                if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
+                {
+                    lastDetailPage = page;
+                    break;
+                }
+            }
 
             //var text = pages[93].ExtractText().Remove(0, 70);
 
@@ -96,7 +96,8 @@ namespace Com.MobileSolutions.Application.Helpers
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-            detailList.Add(DetailPageReader(document, 93));
+            //detailList.Add(DetailPageReader(document, 93));
+
 
             foreach (var page in pageList)
             {
@@ -245,22 +246,21 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             var lineCount = 0;
-            var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan) && p.Contains(Constants.MonthlyCharges));
-            var containsMRC = page.FirstOrDefault(p => p.Contains(Constants.MonthlyCharges));
+            var YourPlan = page.FirstOrDefault(p => p.Contains(Constants.YourPlan));
             var firstYourPlan = Array.IndexOf(page.ToArray(), YourPlan);
 
             foreach (var line in page)
             {
                 var len = line.Length;
 
-                if (len > 52 && lineCount > firstYourPlan && containsMRC != null)
+                if (len > 52 && lineCount > firstYourPlan)
                 {
                     var lineWithChars = line.Insert(52, Constants.LineSeparator);
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
                     formattedPage.Add(regex.Replace(lineWithChars.TrimStart().TrimEnd(), "|"));
                 }
-                else if(lineCount > firstYourPlan && containsMRC == null)
+                else if(lineCount > firstYourPlan)
                 {
                     RegexOptions options = RegexOptions.None;
                     Regex regex = new Regex("[ ]{2,}", options);
@@ -475,7 +475,7 @@ namespace Com.MobileSolutions.Application.Helpers
                     usgsumDetail.CHG_QTY1_TYPE = Utils.GetChargesType(internationDataRegexGroup[2].ToString());
                     usgsumDetail.CHG_QTY1_USED = internationDataRegexGroup[10].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[10].ToString().Replace(",", string.Empty));
                     usgsumDetail.CHG_QTY1_BILLED = internationDataRegexGroup[13].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[13].ToString().Equals(string.Empty) ? "0" : internationDataRegexGroup[13].ToString().Replace(",", string.Empty));
-                    usgsumDetail.CHG_AMT = internationDataRegexGroup[16].ToString().Contains("--") ? "0" : Utils.NumberFormat(internationDataRegexGroup[16].ToString().Replace(Constants.MoneySign, string.Empty));
+                    usgsumDetail.CHG_AMT = internationDataRegexGroup[16].ToString().Contains("--") | internationDataRegexGroup[16].ToString().Contains("**") ? "0" : Utils.NumberFormat(internationDataRegexGroup[16].ToString().Replace(Constants.MoneySign, string.Empty));
 
                     usgsumDetail.CURRENCY = Constants.USD;
                     usgsumDetail.SHARE_IND = share ? "True" : string.Empty;
@@ -676,12 +676,13 @@ namespace Com.MobileSolutions.Application.Helpers
 
             var purchasesRegex = new Regex(Constants.PurchasesRegex).Match(detailValues);
 
+
             if (purchasesRegex.Success)
             {
                 mrcData = new DetailDto();
                 var purchasesRegexGroup = purchasesRegex.Groups;
 
-                var begYear = Convert.ToInt32(purchasesRegexGroup[2].ToString()) >= 1 && Convert.ToInt32(purchasesRegexGroup[2].ToString()) <= dateDueMonth ? dateDueYear : dateDueYear - 1;
+                var begYear = Convert.ToInt32(purchasesRegexGroup[1].ToString()) >= 1 && Convert.ToInt32(purchasesRegexGroup[1].ToString()) <= dateDueMonth ? dateDueYear : dateDueYear - 1;
 
                 mrcData.UNIQ_ID = Constants.OCC;
                 mrcData.CHG_CLASS = Constants.LevelOne;
@@ -691,9 +692,9 @@ namespace Com.MobileSolutions.Application.Helpers
                 mrcData.SUBSCRIBER = serviceId;
                 mrcData.CHG_CODE_1 = purchasesRegexGroup[4].ToString().Replace(Constants.Pipe, ' ').Trim();
 
-                mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(purchasesRegexGroup[2].ToString()), Convert.ToInt32(purchasesRegexGroup[3].ToString())).ToString("M/d/yyyy");
-                mrcData.END_CHG_DATE = new DateTime(begYear, Convert.ToInt32(purchasesRegexGroup[2].ToString()), Convert.ToInt32(purchasesRegexGroup[3].ToString())).ToString("M/d/yyyy"); ;
-                mrcData.CHG_AMT = Utils.NumberFormat(purchasesRegexGroup[5].ToString());
+                mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(purchasesRegexGroup[1].ToString()), Convert.ToInt32(purchasesRegexGroup[2].ToString())).ToString("M/d/yyyy");
+                mrcData.END_CHG_DATE = new DateTime(begYear, Convert.ToInt32(purchasesRegexGroup[1].ToString()), Convert.ToInt32(purchasesRegexGroup[2].ToString())).ToString("M/d/yyyy"); ;
+                mrcData.CHG_AMT = Utils.NumberFormat(purchasesRegexGroup[6].ToString());
                 mrcData.CURRENCY = Constants.USD;
                 mrcData.SP_INV_RECORD_TYPE = Constants.PURCHASES;
 

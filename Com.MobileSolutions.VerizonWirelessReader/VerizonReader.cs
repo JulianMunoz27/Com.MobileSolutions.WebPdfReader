@@ -363,10 +363,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         var planName = "";
                         do
                         {
-                            planName = detailArray[yourPlanWordArray + 1];
+                            planName = detailArray[yourPlanWordArray + 1].Contains(Constants.LineSeparator) ? detailArray[yourPlanWordArray + 1].Split(Constants.LineSeparator)[0] : detailArray[yourPlanWordArray + 1];
                             yourPlanWordArray++;
                         }
-                        while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom));
+                        while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom) || planName.Equals(Constants.RequirementsNotMet));
                         
                         
                         DetailDto mrcData = new DetailDto();
@@ -846,18 +846,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                 {
 
 
-                                                    if (new Regex(Constants.InternationDataSpecialCaseRegex).IsMatch(detailValues))
-                                                    {
-                                                        var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
-
-                                                        if (usgsumDetail != null)
-                                                        {
-                                                            usgsumResult.Add(usgsumDetail);
-                                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
-                                                        }
-                                                    }
-                                                    else
+                                                    if (new Regex(Constants.InternationVoiceRegex).IsMatch(detailValues))
                                                     {
                                                         var internationalVoiceRegex = new Regex(Constants.InternationVoiceRegex).Match(detailValues);
 
@@ -891,6 +880,18 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                                 planName = $"{planName} {detailValues.Replace(Constants.Pipe, ' ')}";
                                                             }
 
+                                                        }
+                                                       
+                                                    }
+                                                    else
+                                                    {
+                                                        var usgsumDetail = helper.GetData(detailValues, mrcDataSpName, serviceId, false, this.accountNumber, Constants.INTERNATIONAL);
+
+                                                        if (usgsumDetail != null)
+                                                        {
+                                                            usgsumResult.Add(usgsumDetail);
+                                                            this.lineTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
+                                                            this.accountTotal += !string.IsNullOrEmpty(usgsumDetail.CHG_AMT) ? System.Convert.ToDecimal(usgsumDetail.CHG_AMT) : 0;
                                                         }
                                                     }
 
@@ -1112,7 +1113,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     var matchDiscount = new Regex(Constants.M2MDiscount).Match(dataValues);
                                     if (matchDiscount.Success && !dataValues.Contains(Constants.Subtotal))
                                     {
-                                        result.Add(this.SetValue(Constants.MRC, matchDiscount.Groups[1].ToString(), string.Empty, string.Empty, string.Empty, string.Empty, matchDiscount.Groups[2].ToString(), Constants.MonthlyCharges.ToUpper()));
+                                        result.Add(this.SetValue(Constants.MRC, matchDiscount.Groups[1].ToString(), string.Empty, string.Empty, string.Empty, string.Empty, matchDiscount.Groups[3].ToString(), Constants.MonthlyCharges.ToUpper()));
 
                                     }
                                     else
@@ -1121,10 +1122,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         if (m2mUsgMatch.Success)
                                         {
                                             var m2mUsgMatchGroup = m2mUsgMatch.Groups;
-                                            var chgQty1Used = m2mUsgMatchGroup[12].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[12].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[12].ToString());
-                                            var chgQty1Allowed = m2mUsgMatchGroup[10].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[10].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[10].ToString());
-                                            var chgQty1Billed = m2mUsgMatchGroup[14].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[14].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[14].ToString());
-                                            var chgAmt = m2mUsgMatchGroup[8].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[8].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[8].ToString());
+                                            var chgQty1Used = m2mUsgMatchGroup[13].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[12].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[13].ToString());
+                                            var chgQty1Allowed = m2mUsgMatchGroup[11].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[10].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[11].ToString());
+                                            var chgQty1Billed = m2mUsgMatchGroup[15].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[14].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[15].ToString());
+                                            var chgAmt = m2mUsgMatchGroup[9].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[8].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[9].ToString());
                                             //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
                                             usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, chgQty1Used, chgQty1Allowed, chgQty1Billed, chgAmt, Constants.DATA));
                                         }
