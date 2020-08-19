@@ -132,7 +132,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string LicenseRegex = @"\|?([^\|]+ License(s)? @\s\-?\$?([0-9]*,)?[0-9]*\.[0-9]*\son\s(\d{1,2}\/\d{1,2}\/\d{2}))\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)$";
         public static string DetailForRegex = @"^Detail\sfor\s([^:]+):\s(\d{3}\-\d{3}\-\d{4})$";
         public static string SurchargesRegex = @"([^\|]*\|)?([^\|]*)\|(\-?([0-9]+,)?[0-9]*\.[0-9]*)$";
-        public static string SurchargesRegex2 = @"([^\|]*\|)?([^\|]*(\||\s)\d* of \d*)\|(\-?[0-9]*\.[0-9]*)$";
+        public static string SurchargesRegex2 = @"([^\|]*\|)?([^\|]*(\||\s)\d* of \d*)\|(\-?([0-9]+,)?[0-9]*\.[0-9]*)$";
         public static string TaxesGovernmentalSurchargesRegex = @"(([^\|]+)\|)?([^\|]+)\|(\-?[0-9]*(\.[0-9]*))$";
         public static string IndexRegex = @"^(\|[^\|]+)*\|([0-9]*)\|(-?\$(\d|\,|\.)*)(.+)";
         public static string IndexRegex2 = @"(^\|[0-9]{3}-[0-9]{3}-[0-9]{4})(([^\|\s\-]*|\||\s|\-)+)(\||\s|\-)?([0-9]{1,5})?(\||\s)(\-?\$[0-9]*\.[0-9]+)";
