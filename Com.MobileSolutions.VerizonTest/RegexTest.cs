@@ -20,6 +20,7 @@ namespace Com.MobileSolutions.VerizonTest
         private string Adjustment1;
         private string Adjustment2;
         private string InternationalMessage;
+        private string MonthlyCharges;
 
         [SetUp]
         public void Setup()
@@ -38,6 +39,7 @@ namespace Com.MobileSolutions.VerizonTest
             Adjustment1 = Constants.AdjustmentRegex1;
             Adjustment2 = Constants.AdjustmentRegex2;
             InternationalMessage = Constants.InternationalMessageRegex;
+            MonthlyCharges = Constants.MonthlyChargesRegex;
         }
 
         [Test]
@@ -232,6 +234,30 @@ namespace Com.MobileSolutions.VerizonTest
             Assert.IsTrue(seventhScenario);
             Assert.IsTrue(eighthScenario);
             Assert.IsTrue(ninthScenario);
+        }
+
+        public void MonthlyChargesTest()
+        {
+            var scenariesList = new string[2] { "|Custom|MBB 1MB|08/17 - 09/16|5.00", "|Custom MBB 1MB|08/17 - 09/16|5.00" };
+
+            var firstScenario = new Regex(MonthlyCharges).Match(scenariesList[0]);
+            Assert.IsTrue(firstScenario.Success);
+            Assert.AreEqual("Custom|MBB 1MB", firstScenario.Groups[2].ToString());
+            Assert.AreEqual("08", firstScenario.Groups[3].ToString());
+            Assert.AreEqual("17", firstScenario.Groups[4].ToString());
+            Assert.AreEqual("09", firstScenario.Groups[5].ToString());
+            Assert.AreEqual("16", firstScenario.Groups[6].ToString());
+            Assert.AreEqual("5.00", firstScenario.Groups[7].ToString());
+
+            var scenario2 = new Regex(MonthlyCharges).Match(scenariesList[1]);
+            Assert.IsTrue(scenario2.Success);
+            Assert.AreEqual("Custom MBB 1MB", scenario2.Groups[2].ToString());
+            Assert.AreEqual("08", scenario2.Groups[3].ToString());
+            Assert.AreEqual("17", scenario2.Groups[4].ToString());
+            Assert.AreEqual("09", scenario2.Groups[5].ToString());
+            Assert.AreEqual("16", scenario2.Groups[6].ToString());
+            Assert.AreEqual("5.00", scenario2.Groups[7].ToString());
+
         }
     }
 }

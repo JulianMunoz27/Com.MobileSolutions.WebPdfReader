@@ -73,30 +73,30 @@ namespace Com.MobileSolutions.Application.Helpers
             }
 
             ///Put every page in a list to be able to search certain values
-            for (int page = 0; page < document.Pages.Count; page++)
-            {
-                var text = pages[page].ExtractText().Remove(0, 70);
-                RegexOptions options = RegexOptions.None;
-                Regex regex = new Regex("[ ]{2,}", options);
-                text = regex.Replace(text, "|");
-                pageList.Add(text);
+            //for (int page = 0; page < document.Pages.Count; page++)
+            //{
+            //    var text = pages[page].ExtractText().Remove(0, 70);
+            //    RegexOptions options = RegexOptions.None;
+            //    Regex regex = new Regex("[ ]{2,}", options);
+            //    text = regex.Replace(text, "|");
+            //    pageList.Add(text);
 
 
-                if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
-                {
-                    lastDetailPage = page;
-                    break;
-                }
-            }
+            //    if (text.Contains("Total Current Charges") && text.Contains("|Charges by Cost Center|Number|Charges|Charges|Charges|Credits|and Fees|(includes Tax)|Charges|Usage|Usage|Usage|Roaming|Roaming|Roaming"))
+            //    {
+            //        lastDetailPage = page;
+            //        break;
+            //    }
+            //}
 
-            //var text = pages[93].ExtractText().Remove(0, 70);
+            var text = pages[43844].ExtractText().Remove(0, 70);
 
-            //RegexOptions options = RegexOptions.None;
-            //Regex regex = new Regex("[ ]{2,}", options);
-            //text = regex.Replace(text, "|");
-            //pageList.Add(text);
+            RegexOptions options = RegexOptions.None;
+            Regex regex = new Regex("[ ]{2,}", options);
+            text = regex.Replace(text, "|");
+            pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 1175));
+            detailList.Add(DetailPageReader(document, 43844));
 
 
             foreach (var page in pageList)

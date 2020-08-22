@@ -452,7 +452,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 {
                                     var nameRegex = new Regex(Constants.LineSeparatorRegex).Match(detailArray[yourPlanWordArray + 1]);
 
-                                    planName = nameRegex.Groups[1].ToString().Replace(Constants.StringPipe, string.Empty);
+                                    planName = nameRegex.Groups[1].ToString().Replace(Constants.StringPipe, " ");
 
                                     yourPlanWordArray++;                                    
                                 }
@@ -486,9 +486,9 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         }
 
 
-                                        var begYear = Convert.ToInt32(voiceGroup[4].ToString()) >= 1 && Convert.ToInt32(voiceGroup[4].ToString()) <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                                        var begYear = Convert.ToInt32(voiceGroup[3].ToString()) >= 1 && Convert.ToInt32(voiceGroup[3].ToString()) <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
 
-                                        var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[6].ToString()), this.dateDueMonth, this.dateDueYear);
+                                        var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[3].ToString()), Convert.ToInt32(voiceGroup[5].ToString()), this.dateDueMonth, this.dateDueYear);
 
                                         mrcData.UNIQ_ID = Constants.MRC;
                                         mrcData.CHG_CLASS = Constants.LevelOne;
@@ -496,11 +496,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
                                         mrcData.SP_NAME = mrcDataSpName.TrimStart();
                                         mrcData.SUBSCRIBER = serviceId;
-                                        mrcData.CHG_CODE_1 = voiceGroup[3].ToString();
+                                        mrcData.CHG_CODE_1 = voiceGroup[2].ToString().Replace(Constants.StringPipe, " "); 
                                         mrcData.CHG_CODE_2 = planName;
-                                        mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(voiceGroup[4].ToString()), Convert.ToInt32(voiceGroup[5].ToString())).ToString("M/d/yyyy");
-                                        mrcData.END_CHG_DATE = new DateTime(endYear, Convert.ToInt32(voiceGroup[6].ToString()), Convert.ToInt32(voiceGroup[7].ToString())).ToString("M/d/yyyy");
-                                        mrcData.CHG_AMT = Utils.NumberFormat(voiceGroup[8].ToString());
+                                        mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(voiceGroup[3].ToString()), Convert.ToInt32(voiceGroup[4].ToString())).ToString("M/d/yyyy");
+                                        mrcData.END_CHG_DATE = new DateTime(endYear, Convert.ToInt32(voiceGroup[5].ToString()), Convert.ToInt32(voiceGroup[6].ToString())).ToString("M/d/yyyy");
+                                        mrcData.CHG_AMT = Utils.NumberFormat(voiceGroup[7].ToString());
                                         mrcData.CURRENCY = Constants.USD;
                                         mrcData.INFO_ONLY_IND = "N";
                                         mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();

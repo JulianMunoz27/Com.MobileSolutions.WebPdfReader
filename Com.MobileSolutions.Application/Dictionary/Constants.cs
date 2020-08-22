@@ -121,11 +121,11 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string AdjustmentRegex1 = @"^(\||)(([^\|]+)\|(\d*\s?)?(for (\d{3}\-\d{3}\-\d{4})\s?)?on (\d{1,2}\/\d{1,2}\/\d{2}))\|(-?(\d|\,|\.)*)$";
         public static string AdjustmentRegex2 = @"^(\||)(([^\|]+) (\d{3}\-\d{3}\-\d{4})?(\s)?on (\d{1,2}\/\d{1,2}\/\d{2}))\|(-?(\d|\,|\.)*)$";
         public static string TotalCurrentChargesRegex = @"(Total Current Charges for [0-9]{3}-[0-9]{3}-[0-9]{4})\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)$";
-        public static string EquipmentChargesRegex = @"([^\|]+\|)?(Device Payment Agreement ([0-9]*) - Payment [0-9]{1,2} of [0-9]{1,2})\|\-?(([0-9]*)?\.[0-9]*)$";
-        public static string EquipmentChargesRegex1 = @"([^\|]*\|)?([^\|]*)\|\-?(([0-9]*)?\.[0-9]*)$";
+        public static string EquipmentChargesRegex = @"([^\|]+\|)?(Device Payment Agreement ([0-9]*) - Payment [0-9]{1,2} of [0-9]{1,2})\|(\-?([0-9]*,)?([0-9]*)?\.[0-9]*)$";
+        public static string EquipmentChargesRegex1 = @"([^\|]*\|)?([^\|]*)\|(\-?([0-9]*,)?([0-9]*)?\.[0-9]*)$";
         public static string EquipmentChargesRegex2 = @"([^\|]*\|)?(Equipment Purchase\|(\d{1,2}\/\d{1,2}) [^\|]*\|([0-9]*))\|(\-?([0-9]*,)?([0-9]*)?\.[0-9]*)$";
-        public static string EquipmentChargesRegex3 = @"([^\|]*\|)?([^\|]*\|\(one-time charge\))\|\-?(([0-9]*)?\.[0-9]*)$";
-        public static string MonthlyChargesRegex = @"(([^\|]+)\|)?([^\|]+)\|([0-9]{2})\/([0-9]{2})\s\-\s([0-9]{2})\/([0-9]{2})\|(\-?[0-9]*(\.[0-9]*))$";
+        public static string EquipmentChargesRegex3 = @"([^\|]*\|)?([^\|]*\|\(one-time charge\))\|(\-?([0-9]*,)?([0-9]*)?\.[0-9]*)$";
+        public static string MonthlyChargesRegex = @"(\|)?(.+)\|([0-9]{2})\/([0-9]{2})\s\-\s([0-9]{2})\/([0-9]{2})\|(\-?[0-9]*(\.[0-9]*))$";
         public static string DevicePaymentChargeRegex = @"([^\|]+\|)?(Device Payment Buyout Charge \(\d{1,3} - \d{1,3}\) Agreement \d*)\|(\-?([0-9]+,)*[0-9]*(\.[0-9]*))$";
         public static string VoiceRegex = @"([^\|][^\|]+)\|(\-?[0-9]*\.[0-9]{1,2})";
         public static string BroadbandRegex = @"^\|(([^\|]+) (\d{1,2}\/\d{1,2}\/\d{1,2}))\|(-?\$?(\d|\,|\.)*)$";
@@ -157,7 +157,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string BillDateRegex = @"(\|?)(Bill Date\|)([A-z\s\-0-9\,]+)";
         public static string QuickBillSummaryDateRegex = @"(\|?)(Quick Bill Summary\|)([A-z\s\-0-9\,]+)";
         public static string DueDateRegex = @"([^\|]+)(\|[^\|]+)([\s|\|])(\d{1,2}\/\d{1,2}\/\d{1,2})";
-        public static string LineSeparatorRegex = @"(^[^%@|]+)(%@)?";
+        public static string LineSeparatorRegex = @"(^[^%@]+)(%@)?";
         //*******************************************************************************************************************
 
         public static string Voice = "Voice";
