@@ -505,8 +505,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         mrcData.INFO_ONLY_IND = "N";
                                         mrcData.SP_INV_RECORD_TYPE = Constants.MonthlyCharges.ToUpper();
 
-                                        this.lineTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
-                                        this.accountTotal += System.Convert.ToDecimal(Utils.NumberFormat(voiceGroup[8].ToString()).Replace(",", string.Empty));
+                                        this.lineTotal += System.Convert.ToDecimal(mrcData.CHG_AMT);
+                                        this.accountTotal += System.Convert.ToDecimal(mrcData.CHG_AMT);
 
                                         result.Add(mrcData);
                                     }

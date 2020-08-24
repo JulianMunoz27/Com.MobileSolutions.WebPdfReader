@@ -89,14 +89,14 @@ namespace Com.MobileSolutions.Application.Helpers
                 }
             }
 
-            //var text = pages[43844].ExtractText().Remove(0, 70);
+            //var text = pages[653].ExtractText().Remove(0, 70);
 
             //RegexOptions options = RegexOptions.None;
             //Regex regex = new Regex("[ ]{2,}", options);
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 43844));
+            //detailList.Add(DetailPageReader(document, 653));
 
 
             foreach (var page in pageList)
