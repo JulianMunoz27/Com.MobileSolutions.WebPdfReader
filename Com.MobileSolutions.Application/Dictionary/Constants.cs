@@ -93,7 +93,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string SummaryRegex = @"^Summary for(.*): ([0-9]{3}-[0-9]{3}-[0-9]{4})";
         public static string AccountNumberRegex = @"Account Number\|(([0-9])*-([0-9])+)";
         public static string CreditBalanceRegex = @"Credit Balance\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)";
-        public static string BalanceForwardDueImmediatelyRegex = @"Balance Forward( Due Immediately)?\|(\-?\$?cccc[0-9]*\.[0-9]*)";
+        public static string BalanceForwardDueImmediatelyRegex = @"Balance Forward( Due Immediately)?\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)";
         public static string MoneyRegex = @"(\(?[A-z0-9]*[.]?\)?\s?\|?|[&]\s|[-]\s)+(\-?\$[0-9]*(\.[0-9]{1,2})?)$";
         public static string OnlyMoneyRegex = @"(\-?\$[0-9]*(\.[0-9]{1,2})?)$";
         public static string MoneyRegexWithout = @"(\-?[0-9]*(\.[0-9]*))$";
