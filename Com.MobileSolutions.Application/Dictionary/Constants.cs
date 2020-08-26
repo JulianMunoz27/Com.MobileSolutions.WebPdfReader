@@ -89,7 +89,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string FinalValueRegex = @"^(\|)?(\-?\$[0-9]*(\.[0-9]{1,2})?)$";
         public static string SurchargesTitleRegex = @"Surcharges\+?$";
         public static string AdjustmentsTitleRegex = @"^(\||[^\|]*\||)(Adjustments|Adjustments, continued)$";
-        public static string TaxesGovernmentalSurchargesFeesTitleRegex = @"Taxes, Governmental Surcharges and Fees\+?%@?$";
+        public static string TaxesGovernmentalSurchargesFeesTitleRegex = @"Taxes, Governmental Surcharges and Fees\+?(%@)?$";
         public static string SummaryRegex = @"^Summary for(.*): ([0-9]{3}-[0-9]{3}-[0-9]{4})";
         public static string AccountNumberRegex = @"Account Number\|(([0-9])*-([0-9])+)";
         public static string CreditBalanceRegex = @"Credit Balance\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)";
