@@ -1122,10 +1122,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         if (m2mUsgMatch.Success)
                                         {
                                             var m2mUsgMatchGroup = m2mUsgMatch.Groups;
-                                            var chgQty1Used = m2mUsgMatchGroup[13].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[12].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[13].ToString());
-                                            var chgQty1Allowed = m2mUsgMatchGroup[11].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[10].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[11].ToString());
-                                            var chgQty1Billed = m2mUsgMatchGroup[15].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[14].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[15].ToString());
-                                            var chgAmt = m2mUsgMatchGroup[9].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[8].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[9].ToString());
+                                            var chgQty1Used = m2mUsgMatchGroup[13].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[13].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[13].ToString());
+                                            var chgQty1Allowed = m2mUsgMatchGroup[11].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[11].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[11].ToString());
+                                            var chgQty1Billed = m2mUsgMatchGroup[15].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[15].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[15].ToString());
+                                            var chgAmt = m2mUsgMatchGroup[9].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[9].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[9].ToString());
                                             //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
                                             usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, chgQty1Used, chgQty1Allowed, chgQty1Billed, chgAmt, Constants.DATA));
                                         }
