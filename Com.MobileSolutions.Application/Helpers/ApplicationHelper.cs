@@ -91,12 +91,12 @@ namespace Com.MobileSolutions.Application.Helpers
 
             //var text = pages[300].ExtractText().Remove(0, 70);
 
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex("[ ]{2,}", options);
-            text = regex.Replace(text, "|");
-            pageList.Add(text);
+            //RegexOptions options = RegexOptions.None;
+            //Regex regex = new Regex("[ ]{2,}", options);
+            //text = regex.Replace(text, "|");
+            //pageList.Add(text);
 
-            detailList.Add(DetailPageReader(document, 300));
+            //detailList.Add(DetailPageReader(document, 300));
 
 
             foreach (var page in pageList)
