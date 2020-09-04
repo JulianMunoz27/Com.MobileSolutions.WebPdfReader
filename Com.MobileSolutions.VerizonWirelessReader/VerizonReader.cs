@@ -940,6 +940,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     {
                                         break;
                                     }
+                                    else if(detailArray[firstOtherChargesStartPosArray + 1].Contains("%@|Taxes, Governmental Surcharges and Fees"))
+                                    {
+                                        break;
+                                    }
                                     firstOtherChargesStartPosArray++;
                                 }
                             }
