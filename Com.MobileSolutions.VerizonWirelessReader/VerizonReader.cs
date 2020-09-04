@@ -546,7 +546,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges));
                                 var occStartPosArray = Array.IndexOf(detailArray, firstOcc);
 
-                                while (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe).Length - 1]))
+                                while (occStartPosArray + 1 < detailArray.Length && (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe).Length - 1])))
                                 {
                                     DetailDto equipment = this.GetEquipmentCharges(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]), mrcDataSpName, serviceId);
 
