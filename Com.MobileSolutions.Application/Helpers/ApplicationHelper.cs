@@ -738,7 +738,7 @@ namespace Com.MobileSolutions.Application.Helpers
 
         public bool previousPageCheck(int previousPage)
         { 
-            if ((previousPage >= 997 && previousPage <= 1000) || (previousPage >= 9997 && previousPage <= 10000))
+            if ((previousPage >= 995 && previousPage <= 1000) || (previousPage >= 9995 && previousPage <= 10000))
             {
                 return true;
             }
