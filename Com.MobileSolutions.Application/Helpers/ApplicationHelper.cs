@@ -1,10 +1,12 @@
 ﻿using Com.MobileSolutions.Application.Dictionary;
 using Com.MobileSolutions.Application.Enums;
 using Com.MobileSolutions.Domain.Models;
+using NLog;
 using Spire.Pdf;
 using Spire.Pdf.Widget;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,6 +17,8 @@ namespace Com.MobileSolutions.Application.Helpers
     {
         private PdfDocument document;
         private int previousPage = 0;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public ApplicationHelper(PdfDocument document, string path)
         {
             this.document = document;
@@ -57,7 +61,7 @@ namespace Com.MobileSolutions.Application.Helpers
             return list;
         }
 
-        public List<List<string>> ReadDetails(PdfDocument document, string path)
+        public List<List<string>> ReadDetails(PdfDocument document, PathValues pathValues)
         {
             int lastDetailPage = 0;
             int errorCount = 0;
@@ -68,7 +72,7 @@ namespace Com.MobileSolutions.Application.Helpers
 
             lock (this)
             {
-                document.LoadFromFile(path);
+                document.LoadFromFile(pathValues.Path);
                 pages = document.Pages;
             }
 
@@ -174,7 +178,26 @@ namespace Com.MobileSolutions.Application.Helpers
                                         var valueRegex = new Regex(Constants.IndexRegex3).Match(indexGroup[2].ToString());
                                         if (valueRegex.Success)
                                         {
-                                            previousPage = Convert.ToInt32(Convert.ToInt32(valueRegex.Value) > document.Pages.Count ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
+                                            if (previousPage < 1)
+                                            {
+                                                var fix = splittedPage[line + 1];
+                                                var fixRegex = new Regex(Constants.IndexRegex2).Match(fix);
+                                                var fixGroup = fixRegex.Groups;
+
+                                                if (!string.IsNullOrEmpty(fixGroup[5].ToString()))
+                                                {
+                                                    previousPage = Convert.ToInt32(Convert.ToInt64(valueRegex.Value) > document.Pages.Count ? valueRegex.Value.Substring(valueRegex.Value.Length - fixGroup[5].ToString().Length) : valueRegex.Value);
+                                                    if (previousPage != 0)
+                                                    {
+                                                        detailList.Add(DetailPageReader(document, previousPage));
+                                                    }
+                                                }
+                                            }
+                                            else 
+                                            {
+                                                previousPage = Convert.ToInt32(Convert.ToInt32(valueRegex.Value) > document.Pages.Count ? previousPageCheck(previousPage) ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length - 1) : valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
+                                            }
+                                            
                                             if (previousPage != 0)
                                             {
                                                 detailList.Add(DetailPageReader(document, previousPage));
@@ -183,13 +206,17 @@ namespace Com.MobileSolutions.Application.Helpers
                                         }
                                         else
                                         {
-                                            Console.WriteLine(splittedPage[line]);
+                                            var fileName = Path.GetFileName(pathValues.Path);
+                                            System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                                            logger.Error("File index extraction failed");
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    Console.WriteLine(splittedPage[line]);
+                                    var fileName = Path.GetFileName(pathValues.Path);
+                                    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                                    logger.Error("File index extraction failed");
                                     errorCount++;
                                     buggedStrings.Add(splittedPage[line]);
                                 }
@@ -707,6 +734,16 @@ namespace Com.MobileSolutions.Application.Helpers
         {
 
             return line.Contains(Constants.LineSeparator) ? line.Substring(line.IndexOf("%@") + 2) : line;
+        }
+
+        public bool previousPageCheck(int previousPage)
+        { 
+            if ((previousPage >= 997 && previousPage <= 1000) || (previousPage >= 9997 && previousPage <= 10000))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

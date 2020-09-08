@@ -136,7 +136,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string TaxesGovernmentalSurchargesRegex = @"(([^\|]+)\|)?([^\|]+)\|(\-?[0-9]*(\.[0-9]*))$";
         public static string IndexRegex = @"^(\|[^\|]+)*\|([0-9]*)\|(-?\$(\d|\,|\.)*)(.+)";
         public static string IndexRegex2 = @"(^\|[0-9]{3}-[0-9]{3}-[0-9]{4})(([^\|\s\-]*|\||\s|\-)+)(\||\s|\-)?([0-9]{1,5})?(\||\s)(\-?\$[0-9]*\.[0-9]+)";
-        public static string IndexRegex3 = @"(\d{1,5}$)";
+        public static string IndexRegex3 = @"(\d+$)";
         public static string PurchasesRegex = @"^\|?([0-9]{1,2})\/([0-9]{1,2})(\||\s)(([^\|]*\|)+)(\-?[0-9]*?\.[0-9]*)$";
         public static string InternationalMessageRegex = @"([^\|]*)\|?(messages( sent| rcvd)?)( unlimited)?(\|(([0-9]*,)?[0-9]*|\-\-))?\|(([0-9]*,)?[0-9]*|\-\-)\|(([0-9]*,)?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationVoiceRegex = @"(|[^\|]+\|)([^\|]{2}[^\|]+|[^\|]+\|\d{2}\/\d{2})\|(-?\$?(\d|\,|\.)+)$";
