@@ -187,10 +187,6 @@ namespace Com.MobileSolutions.Application.Helpers
                                                 if (!string.IsNullOrEmpty(fixGroup[5].ToString()))
                                                 {
                                                     previousPage = Convert.ToInt32(Convert.ToInt64(valueRegex.Value) > document.Pages.Count ? valueRegex.Value.Substring(valueRegex.Value.Length - fixGroup[5].ToString().Length) : valueRegex.Value);
-                                                    if (previousPage != 0)
-                                                    {
-                                                        detailList.Add(DetailPageReader(document, previousPage));
-                                                    }
                                                 }
                                             }
                                             else 
