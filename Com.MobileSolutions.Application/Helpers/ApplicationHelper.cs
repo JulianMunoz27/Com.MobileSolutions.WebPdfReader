@@ -191,7 +191,7 @@ namespace Com.MobileSolutions.Application.Helpers
                                             }
                                             else 
                                             {
-                                                previousPage = Convert.ToInt32(Convert.ToInt32(valueRegex.Value) > document.Pages.Count ? previousPageCheck(previousPage) ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length - 1) : valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
+                                                previousPage = Convert.ToInt32(Convert.ToInt64(valueRegex.Value) > Convert.ToInt64(document.Pages.Count) ? previousPageCheck(previousPage) ? valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length - 1) : valueRegex.Value.Substring(valueRegex.Value.ToString().Length - previousPage.ToString().Length) : valueRegex.Value);
                                             }
                                             
                                             if (previousPage != 0)
