@@ -86,7 +86,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         //*********************************************** Regex *************************************************************
         //*******************************************************************************************************************
         public static string OtherChargesCreditsRegex = @"(([^\|][^\|]+)(\|\d{1,3} of \d{1,3})?)\|(\-?([0-9]*,)?[0-9]*\.[0-9]{1,2})";
-        public static string FinalValueRegex = @"^(\|)?(\-?\$[0-9]*(\.[0-9]{1,2})?)$";
+        public static string FinalValueRegex = @"^(\|)?(\-?\$[0-9,]*(\.[0-9]{1,2})?)$";
         public static string SurchargesTitleRegex = @"Surcharges\+?$";
         public static string AdjustmentsTitleRegex = @"^(\||[^\|]*\||)(Adjustments|Adjustments, continued)$";
         public static string TaxesGovernmentalSurchargesFeesTitleRegex = @"Taxes, Governmental Surcharges and Fees\+?(%@)?$";

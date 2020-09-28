@@ -100,7 +100,7 @@ namespace Com.MobileSolutions.Application.Helpers
             //text = regex.Replace(text, "|");
             //pageList.Add(text);
 
-            //detailList.Add(DetailPageReader(document, 300));
+            detailList.Add(DetailPageReader(document, 300));
 
 
             foreach (var page in pageList)
