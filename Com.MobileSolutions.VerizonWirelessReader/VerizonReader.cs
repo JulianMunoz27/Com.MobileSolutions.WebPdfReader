@@ -432,6 +432,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         do
                         {
                             detailArray = pageContent.ToArray();
+
+                            if(string.IsNullOrEmpty(usagePurchesFind))
+                            {
+                                usagePurchesFind = pageContent.FirstOrDefault(d => d.Contains(Constants.UsagePurchaseCharges));
+                            }
                             totalCurrentChargesFor = pageContent.FirstOrDefault(d => d.Contains(Constants.TotalCurrentChargesFor));
                             yourPlanMonthlyFind = pageContent.FirstOrDefault(d => d.Contains(Constants.YourPlanMonthlyCharges));
 
@@ -1098,17 +1103,17 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
 
 
-                                    result.Add(this.SetValue(Constants.MRC, M2MPlanName, string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[2].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.MonthlyCharges.ToUpper()));
+                                    result.Add(this.SetValue(Constants.MRC, M2MPlanName, string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[2].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.M2M));
 
 
                                     if (!matchName.Groups[6].ToString().Equals("--"))
-                                        surTaxesResult.Add(this.SetValue(Constants.OCC, $"Equipment on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[6].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.Equipment));
+                                        surTaxesResult.Add(this.SetValue(Constants.OCC, $"Equipment on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[6].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.M2M));
 
                                     if (!matchName.Groups[8].ToString().Equals("--"))
-                                        surTaxesResult.Add(this.SetValue(Constants.SUR, $"Surcharges on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[8].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.SurchargesType));
+                                        surTaxesResult.Add(this.SetValue(Constants.SUR, $"Surcharges on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[8].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.M2M));
 
                                     if (!matchName.Groups[10].ToString().Equals("--"))
-                                        surTaxesResult.Add(this.SetValue(Constants.TAX, $"Tax on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[10].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.TaxesType));
+                                        surTaxesResult.Add(this.SetValue(Constants.TAX, $"Tax on {M2MPlanName}", string.Empty, string.Empty, string.Empty, string.Empty, Utils.NumberFormat(matchName.Groups[10].ToString().Replace(Constants.MoneySign, string.Empty)), Constants.M2M));
 
                                 }
                                 else
@@ -1117,7 +1122,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     var matchDiscount = new Regex(Constants.M2MDiscount).Match(dataValues);
                                     if (matchDiscount.Success && !dataValues.Contains(Constants.Subtotal))
                                     {
-                                        result.Add(this.SetValue(Constants.MRC, matchDiscount.Groups[1].ToString(), string.Empty, string.Empty, string.Empty, string.Empty, matchDiscount.Groups[3].ToString(), Constants.MonthlyCharges.ToUpper()));
+                                        result.Add(this.SetValue(Constants.MRC, matchDiscount.Groups[1].ToString(), string.Empty, string.Empty, string.Empty, string.Empty, matchDiscount.Groups[3].ToString(), Constants.M2M));
 
                                     }
                                     else
@@ -1131,7 +1136,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                             var chgQty1Billed = m2mUsgMatchGroup[15].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[15].ToString()) ? "0" : Utils.RemoveTextFromNumber(m2mUsgMatchGroup[15].ToString());
                                             var chgAmt = m2mUsgMatchGroup[9].ToString().Contains("--") || string.IsNullOrEmpty(m2mUsgMatchGroup[9].ToString()) ? "0" : Utils.NumberFormat(m2mUsgMatchGroup[9].ToString());
                                             //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
-                                            usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, chgQty1Used, chgQty1Allowed, chgQty1Billed, chgAmt, Constants.DATA));
+                                            usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgMatchGroup[1].ToString(), Constants.ChargesType_GB, chgQty1Used, chgQty1Allowed, chgQty1Billed, chgAmt, Constants.M2M));
                                         }
                                         else
                                         {
@@ -1140,7 +1145,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                             {
                                                 var m2mUsgsumMsgMatchGroup = m2mUsgsumMsgMatch.Groups;
                                                 //(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
-                                                usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgsumMsgMatchGroup[1].ToString(), Constants.ChargesType_MSG, m2mUsgsumMsgMatchGroup[7].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[5].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[9].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[2].ToString().Replace(Constants.Hyphen, string.Empty), Constants.MESSAGING));
+                                                usgsumResult.Add(this.SetValue(Constants.USGSUM, m2mUsgsumMsgMatchGroup[1].ToString(), Constants.ChargesType_MSG, m2mUsgsumMsgMatchGroup[7].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[5].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[9].ToString().Replace(Constants.Hyphen, string.Empty), m2mUsgsumMsgMatchGroup[2].ToString().Replace(Constants.Hyphen, string.Empty), Constants.M2M));
                                             }
                                             else if (dataValues.Contains(Constants.Subtotal))
                                             {
