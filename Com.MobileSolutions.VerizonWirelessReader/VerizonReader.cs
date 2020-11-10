@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -367,8 +368,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                             yourPlanWordArray++;
                         }
                         while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom) || planName.Equals(Constants.RequirementsNotMet));
-                        
-                        
+
+
                         DetailDto mrcData = new DetailDto();
 
 
@@ -433,7 +434,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                         {
                             detailArray = pageContent.ToArray();
 
-                            if(string.IsNullOrEmpty(usagePurchesFind))
+                            if (string.IsNullOrEmpty(usagePurchesFind))
                             {
                                 usagePurchesFind = pageContent.FirstOrDefault(d => d.Contains(Constants.UsagePurchaseCharges));
                             }
@@ -459,7 +460,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                     planName = nameRegex.Groups[1].ToString().Replace(Constants.StringPipe, " ");
 
-                                    yourPlanWordArray++;                                    
+                                    yourPlanWordArray++;
                                 }
                                 while (string.IsNullOrEmpty(planName) || planName.Contains(Constants.PlanFrom));
 
@@ -476,7 +477,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     if (monthlyChargesRegex.IsMatch(mrcValues))
                                     {
 
-                                        
+
                                         emptyMRCFlag = false;
                                         var voiceGroup = monthlyChargesRegex.Match(mrcValues).Groups;
 
@@ -501,7 +502,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         mrcData.ACCT_LEVEL_2 = Constants.VerizonWireless;
                                         mrcData.SP_NAME = mrcDataSpName.TrimStart();
                                         mrcData.SUBSCRIBER = serviceId;
-                                        mrcData.CHG_CODE_1 = voiceGroup[2].ToString().Replace(Constants.StringPipe, " "); 
+                                        mrcData.CHG_CODE_1 = voiceGroup[2].ToString().Replace(Constants.StringPipe, " ");
                                         mrcData.CHG_CODE_2 = planName;
                                         mrcData.BEG_CHG_DATE = new DateTime(begYear, Convert.ToInt32(voiceGroup[3].ToString()), Convert.ToInt32(voiceGroup[4].ToString())).ToString("M/d/yyyy");
                                         mrcData.END_CHG_DATE = new DateTime(endYear, Convert.ToInt32(voiceGroup[5].ToString()), Convert.ToInt32(voiceGroup[6].ToString())).ToString("M/d/yyyy");
@@ -886,7 +887,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                             }
 
                                                         }
-                                                       
+
                                                     }
                                                     else
                                                     {
@@ -945,7 +946,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                     {
                                         break;
                                     }
-                                    else if(detailArray[firstOtherChargesStartPosArray + 1].Contains("%@|Taxes, Governmental Surcharges and Fees"))
+                                    else if (detailArray[firstOtherChargesStartPosArray + 1].Contains("%@|Taxes, Governmental Surcharges and Fees"))
                                     {
                                         break;
                                     }
@@ -1059,7 +1060,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
 
                                 result.Add(mrcTotal);
 
-                                if(System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) != this.accountTotal)
+                                if (System.Convert.ToDecimal(ftotalCurrentChargesRegex[2].ToString().Replace(Constants.MoneySign, string.Empty).Replace(",", string.Empty)) != this.accountTotal)
                                 {
                                     noReconciledLine.Add(serviceId);
                                 }
@@ -1074,6 +1075,54 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                 }
                 else
                 {
+                    // ***************************************************************************************************************************************
+                    // ************************************************* Overage Details Section *************************************************************
+                    // ***************************************************************************************************************************************
+                    if (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains("|Overage Details"))) ||
+                        !string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains("|Overage Details, continued"))))
+                    {
+                        var firstOverage = detail.FirstOrDefault(d => d.Contains("Overage Details"));
+                        var firstOverageIndex = Array.IndexOf(detailArray, firstOverage);
+                        var overageLenght = detail.ToArray().Length;
+                        var lastTitle = string.Empty;
+                        var overUDF = string.Empty;
+
+                        while (firstOverageIndex + 1 != overageLenght)
+                        {
+                          
+                            var dataValues = detailArray[firstOverageIndex + 1];
+
+                            if (dataValues.Contains("Messaging"))
+                            {
+                                lastTitle = Constants.Messaging;
+                                overUDF = "OVERMSG";
+                            }
+                            else if (dataValues.Contains("Data"))
+                            {
+                                lastTitle = Constants.Data;
+                                overUDF = "OVERDATA";
+                            }
+                            else if (dataValues.Contains("Voice"))
+                            {
+                                lastTitle = Constants.Voice;
+                                overUDF = "OVERVOICE";
+                            }
+
+                            var matchName = new Regex(@"\|?([0-9]+)?\|?([A-z\s-']+)\|(([0-9]{3}\-[0-9]{3}\-[0-9]{4}\s?)?([A-z0-9-\s]+))\|(--|[0-9.GB]+)?\|([0-9.GB]+)\|([0-9.GB]+)\|(\$?[0-9.,]+)").Match(dataValues);
+
+                            if (matchName.Success)
+                            {
+                                var matchNameGroups = matchName.Groups;
+
+                                usgsumResult.Add(this.SetValue(Constants.USGSUM, matchNameGroups[2].ToString(), matchNameGroups[7].ToString(), matchNameGroups[6].ToString().Replace("--", string.Empty), matchNameGroups[8].ToString(), matchNameGroups[3].ToString(), matchNameGroups[9].ToString().Replace(Constants.MoneySign, string.Empty), lastTitle, overUDF, matchNameGroups[5].ToString()));
+                            }
+
+                            firstOverageIndex++;
+                        }
+
+                        var bar = 0;
+                    }
+
                     // ***************************************************************************************************************************************
                     // **********************************************Account Level M2M Section ***************************************************************
                     // ***************************************************************************************************************************************
@@ -1163,11 +1212,10 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 break;
                             }
                             firstM2mIndex++;
-                        }
+                        }                        
+
                         continue;
-                    }
-
-
+                    }                    
 
                     // ***************************************************************************************************************************************
                     // ************************************* Account Level Account Charges and Credits Section ***********************************************
@@ -1351,7 +1399,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         }
                                     }
                                 }
-                                
+
                             }
 
                             if (firstAccountMonthlyIndex + 1 == detailArray.Length - 1)
@@ -1727,7 +1775,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             return result;
         }
 
-        public DetailDto SetValue(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType)
+        public DetailDto SetValue(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType, string UDF = "", string subscriber = "")
         {
             lock (this)
             {
@@ -1746,7 +1794,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                 detailDto.CURRENCY = Constants.USD;
                 detailDto.INFO_ONLY_IND = "N";
                 detailDto.SP_INV_RECORD_TYPE = spInvRecordType;
-                detailDto.UDF = "";
+                detailDto.UDF = UDF;
+                detailDto.SUBSCRIBER = subscriber;
 
 
                 this.lineTotal += System.Convert.ToDecimal(detailDto.CHG_AMT);
@@ -1864,7 +1913,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     zip.AddFile(sourcePath, "");
                     if (this.noReconciledLine.Count > 0)
                         zip.AddFile(lineWithError, "");
-                    
+
                     zip.Save(zipName);
                 }
 

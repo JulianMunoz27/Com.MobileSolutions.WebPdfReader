@@ -129,6 +129,12 @@ namespace Com.MobileSolutions.Application.Helpers
                     }
                 }
 
+                if (page.Contains("|Overage Details") || page.Contains("|Overage Details|Overage Details, Continued"))
+                {
+                    var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+                    detailList.Add(splittedPage);                
+                }
+
                 if (page.Contains(Constants.OverviewM2M))//Overview of Machine to Machine Activity
                 {
                     var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();

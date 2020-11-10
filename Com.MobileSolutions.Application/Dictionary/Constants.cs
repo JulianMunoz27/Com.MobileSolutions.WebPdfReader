@@ -82,6 +82,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string PlanFrom = "Plan from";
         public static string RequirementsNotMet = "of the requirements was not met.";
         public static string M2M = "M2M";
+        public static string Overage = "Overage";
 
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************
