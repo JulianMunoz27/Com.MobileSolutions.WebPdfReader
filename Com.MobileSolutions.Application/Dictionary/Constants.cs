@@ -105,10 +105,10 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string usgsumRegex = @"^([A-z&\s]+)([0-9]{2}\/[0-9]{2}\/[0-9]{2}\:)*(\([0-9]{2}\/[0-9]{2}\s\-\s[0-9]{2}\/[0-9]{2}\))*(\|[A-z\s0-9-.]*)+$";
         public static string surTaxesRegex = @"([A-z$0-9.&%\s])\|(([0-9.])+)$";
         public static string occRegex = @"^([A-z$0-9.&%\s\/-]\|?)+([0-9.])+$";
-        public static string M2MGetPlanName = @"^\|?([^\|]*)\|\d{1,3}\|(\-?\$([0-9]+,)?[0-9]*\.[0-9]*)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)(\|\-?\$[0-9]*\.[0-9]*)\|--\|(\-?\$[0-9]*\.[0-9]*)";
-        public static string M2MUsgsumAvoid = @"^\|?([^\|]+)\|\d of \d\|(\-?|^)\$(\.0*)\|--\|--\|--\|--$";
+        public static string M2MGetPlanName = @"^\|?([^\|]*)\|\d{1,4}\|(\-?\$([0-9]+,)?[0-9]*\.[0-9]*)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)(\|\-?\$[0-9]*\.[0-9]*)\|--\|(\-?\$[0-9]*\.[0-9]*)";
+        public static string M2MUsgsumAvoid = @"^\|?([^\|]+)\|((\d{1,4}|--)( of \d{1,4})\|((\-?|^)\$(\.00*))\|(--)\|(--)\|(--))";
         public static string M2MDiscount = @"^\|?([^\|]*)\|(\d{1,3}|\-\-) of \d{1,3}\|(\-?\$([0-9]+,)?[0-9]*\.[0-9]*)(\|\-\-\|\-\-\|)?$";
-        public static string M2MUsgsum = @"^\|?([^\|]+)\|(\d{1,3}|\-\-) of \d{1,3}(\|((\-?|^)\$([0-9]*\.[0-9]*)|--))?\|((\-?|^)\$([0-9]*\.[0-9]*)|--)(\|([0-9]*\.?[0-9]*(GB|MB|KB)|--))?\|([0-9]*\.?[0-9]*(GB|MB|KB)|--)\|([0-9]*\.?[0-9]*(GB|MB|KB)|--)$";
+        public static string M2MUsgsum = @"^\|?([^\|]+)\|(\d{1,4}|\-\-) of\s?\d*(\|((\-?|^)\$([0-9]*\.[0-9]*)|--))?\|((\-?|^)\$([0-9]*\.?\,?[0-9]*\.[0-9]*)|--)(\|([0-9]*\.?[0-9]*(GB|MB|KB|TB)|--))?\|([0-9]*\.?[0-9]*(GB|MB|KB|TB)|--)\|([0-9]*\.?[0-9]*(GB|MB|KB|TB)|--)$";
         public static string M2MUsgsumMsg = @"^\|?(.+)\|\d{1,3} of \d{1,3}\|(\-?\$([0-9]*,)?([0-9]*)?\.[0-9]*|--)\|(([0-9]*,)?[0-9]*|--)\|(([0-9]*,)?[0-9]*|--)\|(([0-9]*,)?[0-9]*|--)$";
         public static string mrcDateRegex = @" ^ ([0-9]{1,2}\/[0-9]{1,2}\s\-\s[0-9]{1,2}\/[0-9]{1,2})$";
         public static string pageRegex = @"([0-9]{1,10})(\sof\s)([0-9]{1,10})";
@@ -197,6 +197,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string MONTHLY_CHARGES = "MONTHLY CHARGES";
         public static string INTERNATIONAL = "INTERNATIONAL";
         public static string Gigabytes = "gigabytes";
+        public static string ChargesType_TB = "tb";
         public static string ChargesType_GB = "gb";
         public static string ChargesType_KB = "kb";
         public static string ChargesType_MB = "mb";

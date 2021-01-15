@@ -49,7 +49,7 @@ namespace Com.MobileSolutions.Application.Dictionary
 
         public static string RemoveTextFromNumber(String number)
         {
-            var regex = new Regex(@"^([0-9]*\.?[0-9]*)(GB|MB|KB)").Match(number);
+            var regex = new Regex(@"^([0-9]*\.?[0-9]*)(GB|MB|KB|TB)").Match(number);
 
             return regex.Success ? regex.Groups[1].ToString() : number;
         }

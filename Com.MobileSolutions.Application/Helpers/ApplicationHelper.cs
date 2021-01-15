@@ -144,7 +144,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 //
                 if (!page.Contains(Constants.QuickBillSummary) && (page.Contains(Constants.AccountMonthlyCharges) || page.Contains(Constants.AccountChargesAndCreditsContinue) ||
                     page.Contains(Constants.AccountChargesAndCredits) || page.Contains(Constants.PaymentsAdjustments) || page.Contains(Constants.PaymentsAdjustmentsContinue) ||
-                    page.Contains(Constants.AdjustmentsContinued)))//Overview of Machine to Machine Activity
+                    page.Contains(Constants.AdjustmentsContinued) || page.Contains(Constants.Adjustments) && page.Contains(Constants.TotalAdjustments)))//Overview of Machine to Machine Activity
                 {
                     var splittedPage = page.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
                     detailList.Add(splittedPage);
