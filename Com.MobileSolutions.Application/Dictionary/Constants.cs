@@ -15,6 +15,8 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string WhiteSpace = " ";
         public static char Pipe = '|';
         public static string LineSeparator = "%@";
+        public static string DoubleMinus = "--";
+        public static string Zero = "0";
 
         public static string FileName = @"C:\Users\kzuluaga\Documents\Ingeneo\Proyectos\6. EEUU\Pdf Reader\Test Documents\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011.pdf";//201912_VerizonWireless_78590905400001.pdf
         public static string OutPutPath = @"C:\Users\kzuluaga\Documents\Ingeneo\Proyectos\6. EEUU\Pdf Reader\Test Documents\9842064636_PERFORMANCEFOODGROUP_2019-11-12_62027583100011\";
@@ -83,6 +85,8 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string RequirementsNotMet = "of the requirements was not met.";
         public static string M2M = "M2M";
         public static string Overage = "Overage";
+        public static string OverageDetails = "|Overage Details";
+        public static string OverageDetailsContinued = "|Overage Details, continued";
 
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************
@@ -160,6 +164,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string QuickBillSummaryDateRegex = @"(\|?)(Quick Bill Summary\|)([A-z\s\-0-9\,]+)";
         public static string DueDateRegex = @"([^\|]+)(\|[^\|]+)([\s|\|])(\d{1,2}\/\d{1,2}\/\d{1,2})";
         public static string LineSeparatorRegex = @"(^[^%@]+)(%@)?";
+        public static string OverageDetailsDataRegex = @"\|?([^\|]*\s?)\|?(([0-9]{3}\-[0-9]{3}\-[0-9]{4})(\s|\|)([A-z0-9,;.\'\&\#\-\s]+))(\||\s)((--|[0-9.,]*(KB|MB|GB|TB)?)(\||\s)(--|[0-9.,]*(KB|MB|GB|TB)?)(\||\s)(--|[0-9.,]*(KB|MB|GB|TB)?\s?))\|(--|\$([0-9]*\.[0-9]*))([^#]+)?";
         //*******************************************************************************************************************
 
         public static string Voice = "Voice";
