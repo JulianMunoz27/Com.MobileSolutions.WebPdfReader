@@ -13,5 +13,7 @@ namespace Com.MobileSolutions.Domain.Models
         public string ProcessedFilesPath { get; set; }
 
         public string FailedFiles { get; set; }
+
+        public string CorruptedFiles { get; set; } = @"D:\PdfReader\Verizon\corrupt";
     }
 }

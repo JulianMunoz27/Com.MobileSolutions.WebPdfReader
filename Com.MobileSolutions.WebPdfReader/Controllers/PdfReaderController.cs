@@ -81,8 +81,17 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
             catch (Exception ex)
             {
                 var fileName = Path.GetFileName(pathValues.Path);
-                System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
-                logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
+
+                if (ex.Message == "Invalid/Unknown/Unsupported format" || ex.Message == "The index can not be less then zero or greater then Count. (Parameter 'index')")
+                {
+                    System.IO.File.Move(pathValues.Path, $@"{pathValues.CorruptedFiles}\{fileName}");
+                    logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
+                }
+                else
+                {
+                    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                    logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
+                }
             }
         }
     }

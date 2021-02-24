@@ -76,6 +76,20 @@ namespace Com.MobileSolutions.Application.Helpers
                 pages = document.Pages;
             }
 
+            //this will send the file to corrupt folder if the file has issues
+            var lastPageChecker = pages[1].ExtractText();
+            var lastPageRegex = new Regex(Constants.LastPageRegex).Match(lastPageChecker);
+
+            if (lastPageRegex.Success)
+            {
+                var fullPage = lastPageRegex.Value;
+                var pageSplit = fullPage.Split(" ");
+                var lastPage = pageSplit[2];
+                var pageChecker = pages[Convert.ToInt32(lastPage) - 1].ExtractText();
+            }
+
+            
+
             ///Put every page in a list to be able to search certain values
             for (int page = 0; page < document.Pages.Count; page++)
             {
@@ -91,7 +105,7 @@ namespace Com.MobileSolutions.Application.Helpers
                     lastDetailPage = page;
                     break;
                 }
-            }
+            }            
 
             //var text = pages[300].ExtractText().Remove(0, 70);
 
@@ -401,7 +415,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 var endMonth = Convert.ToInt32(accountMonthly[4].ToString().Split('-')[1].Split('/')[0]);
 
                 var begYear = begMonth >= 1 && begMonth <= dateDueMonth ? dateDueYear : dateDueYear - 1;
-                var endYear = endMonth >= 1 && endMonth <= dateDueMonth ? dateDueYear + 1 : dateDueYear;
+                var endYear = endMonth >= 1 && endMonth < dateDueMonth ? dateDueYear + 1 : dateDueYear;
 
                 taxData.UNIQ_ID = Constants.MRC;
                 taxData.CHG_CLASS = Constants.LevelOne;

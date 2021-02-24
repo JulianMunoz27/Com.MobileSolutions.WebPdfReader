@@ -165,6 +165,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string DueDateRegex = @"([^\|]+)(\|[^\|]+)([\s|\|])(\d{1,2}\/\d{1,2}\/\d{1,2})";
         public static string LineSeparatorRegex = @"(^[^%@]+)(%@)?";
         public static string OverageDetailsDataRegex = @"\|?([^\|]*\s?)\|?(([0-9]{3}\-[0-9]{3}\-[0-9]{4})(\s|\|)([A-z0-9,;.\'\&\#\-\s]+))(\||\s)((--|[0-9.,]*(KB|MB|GB|TB)?)(\||\s)(--|[0-9.,]*(KB|MB|GB|TB)?)(\||\s)(--|[0-9.,]*(KB|MB|GB|TB)?\s?))\|(--|\$([0-9]*\.[0-9]*))([^#]+)?";
+        public static string LastPageRegex = @"[0-9]{1}\sof\s[0-9]+";
         //*******************************************************************************************************************
 
         public static string Voice = "Voice";

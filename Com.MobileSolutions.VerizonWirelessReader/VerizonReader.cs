@@ -552,7 +552,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                 var firstOcc = pageContent.FirstOrDefault(d => d.Contains(Constants.EquipmentCharges));
                                 var occStartPosArray = Array.IndexOf(detailArray, firstOcc);
 
-                                while (occStartPosArray + 1 < detailArray.Length && (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe).Length - 1])))
+                                while (detailArray[occStartPosArray + 1].Contains("Surcharges") != true && (occStartPosArray + 1 < detailArray.Length && (!moneyRegex.IsMatch(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe)[helper.RemoveLeftSide(detailArray[occStartPosArray + 1]).Split(Constants.Pipe).Length - 1]))))
                                 {
                                     DetailDto equipment = this.GetEquipmentCharges(helper.RemoveLeftSide(detailArray[occStartPosArray + 1]), mrcDataSpName, serviceId);
 
@@ -1078,73 +1078,73 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                     // ***************************************************************************************************************************************
                     // ************************************************* Overage Details Section *************************************************************
                     // ***************************************************************************************************************************************
-                    if (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.OverageDetails))) ||
-                        !string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.OverageDetailsContinued))))
-                    {
-                        var firstOverage = detail.FirstOrDefault(d => d.Contains("Overage Details"));
-                        var firstOverageIndex = Array.IndexOf(detailArray, firstOverage);
-                        var overageLenght = detail.ToArray().Length;
-                        var lastTitle = string.Empty;
-                        var overUDF = string.Empty;
+                    //if (!string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.OverageDetails))) ||
+                    //    !string.IsNullOrEmpty(detail.FirstOrDefault(d => d.Contains(Constants.OverageDetailsContinued))))
+                    //{
+                    //    var firstOverage = detail.FirstOrDefault(d => d.Contains("Overage Details"));
+                    //    var firstOverageIndex = Array.IndexOf(detailArray, firstOverage);
+                    //    var overageLenght = detail.ToArray().Length;
+                    //    var lastTitle = string.Empty;
+                    //    var overUDF = string.Empty;
 
-                        while (firstOverageIndex + 1 != overageLenght)
-                        {
+                    //    while (firstOverageIndex + 1 != overageLenght)
+                    //    {
 
-                            var dataValues = detailArray[firstOverageIndex + 1];
+                    //        var dataValues = detailArray[firstOverageIndex + 1];
 
-                            if (dataValues.Contains("Messaging"))
-                            {
-                                overUDF = "OVERMSG";
-                            }
-                            else if (dataValues.Contains("Data"))
-                            {
-                                overUDF = "OVERDATA";
-                            }
-                            else if (dataValues.Contains("Voice"))
-                            {
-                                overUDF = "OVERVOICE";
-                            }
+                    //        if (dataValues.Contains("Messaging"))
+                    //        {
+                    //            overUDF = "OVERMSG";
+                    //        }
+                    //        else if (dataValues.Contains("Data"))
+                    //        {
+                    //            overUDF = "OVERDATA";
+                    //        }
+                    //        else if (dataValues.Contains("Voice"))
+                    //        {
+                    //            overUDF = "OVERVOICE";
+                    //        }
 
-                            var matchName = new Regex(Constants.OverageDetailsDataRegex).Match(dataValues);
+                    //        var matchName = new Regex(Constants.OverageDetailsDataRegex).Match(dataValues);
 
-                            if (matchName.Success)
-                            {
-                                var matchNameGroups = matchName.Groups;
+                    //        if (matchName.Success)
+                    //        {
+                    //            var matchNameGroups = matchName.Groups;
 
-                                usgsumResult.Add(this.SetValue(
-                                    Constants.USGSUM, //string type
-                                    matchNameGroups[1].ToString(), //string planName
-                                    matchNameGroups[15].ToString(), //string chgQty1Type 
-                                    matchNameGroups[11].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Used
-                                    matchNameGroups[8].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Allowed
-                                    matchNameGroups[14].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty), //string chgQty1Billed
-                                    matchNameGroups[16].ToString().Replace(Constants.MoneySign, string.Empty), //string chgAmt
-                                    overUDF, string.Empty, matchNameGroups[5].ToString())); //string spInvRecordType
+                    //            usgsumResult.Add(this.SetValue(
+                    //                Constants.USGSUM, //string type
+                    //                matchNameGroups[1].ToString(), //string planName
+                    //                matchNameGroups[15].ToString(), //string chgQty1Type 
+                    //                matchNameGroups[11].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Used
+                    //                matchNameGroups[8].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Allowed
+                    //                matchNameGroups[14].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty), //string chgQty1Billed
+                    //                matchNameGroups[16].ToString().Replace(Constants.MoneySign, string.Empty), //string chgAmt
+                    //                overUDF, string.Empty, matchNameGroups[5].ToString(), matchNameGroups[3].ToString())); //string spInvRecordType
 
-                                if (!string.IsNullOrEmpty(matchNameGroups[18].ToString()))
-                                {
-                                    var rightSide = new Regex(Constants.OverageDetailsDataRegex).Match(matchNameGroups[18].ToString());
+                    //            if (!string.IsNullOrEmpty(matchNameGroups[18].ToString()))
+                    //            {
+                    //                var rightSide = new Regex(Constants.OverageDetailsDataRegex).Match(matchNameGroups[18].ToString());
 
-                                    if (rightSide.Success)
-                                    {
-                                        matchNameGroups = rightSide.Groups;
+                    //                if (rightSide.Success)
+                    //                {
+                    //                    matchNameGroups = rightSide.Groups;
 
-                                        usgsumResult.Add(this.SetValue(
-                                            Constants.USGSUM, //string type
-                                            matchNameGroups[1].ToString(), //string planName
-                                            matchNameGroups[15].ToString(), //string chgQty1Type 
-                                            matchNameGroups[11].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Used
-                                            matchNameGroups[8].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Allowed
-                                            matchNameGroups[14].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty), //string chgQty1Billed
-                                            matchNameGroups[16].ToString().Replace(Constants.MoneySign, string.Empty), //string chgAmt
-                                            matchNameGroups[1].ToString().Contains("Text - Rcv'd") ? "OVERMSG" : overUDF, string.Empty, matchNameGroups[5].ToString())); //string spInvRecordType
-                                    }
-                                }
-                            }
+                    //                    usgsumResult.Add(this.SetValue(
+                    //                        Constants.USGSUM, //string type
+                    //                        matchNameGroups[1].ToString(), //string planName
+                    //                        matchNameGroups[15].ToString(), //string chgQty1Type 
+                    //                        matchNameGroups[11].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Used
+                    //                        matchNameGroups[8].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty),  //string chgQty1Allowed
+                    //                        matchNameGroups[14].ToString().ToLower().Replace(Constants.DoubleMinus, Constants.Zero).Replace(Constants.ChargesType_KB, string.Empty).Replace(Constants.ChargesType_MB, string.Empty).Replace(Constants.ChargesType_GB, string.Empty).Replace(Constants.ChargesType_TB, string.Empty), //string chgQty1Billed
+                    //                        matchNameGroups[16].ToString().Replace(Constants.MoneySign, string.Empty), //string chgAmt
+                    //                        matchNameGroups[1].ToString().Contains("Text - Rcv'd") ? "OVERMSG" : overUDF, string.Empty, matchNameGroups[5].ToString(), matchNameGroups[3].ToString())); //string spInvRecordType
+                    //                }
+                    //            }
+                    //        }
 
-                            firstOverageIndex++;
-                        }
-                    }
+                    //        firstOverageIndex++;
+                    //    }
+                    //}
 
                     // ***************************************************************************************************************************************
                     // **********************************************Account Level M2M Section ***************************************************************
@@ -1414,7 +1414,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                 var endMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[0]);
 
                                                 var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
-                                                var endYear = endMonth >= 1 && endMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                                                var endYear = endMonth >= 1 && endMonth < this.dateDueMonth ? this.dateDueYear + 1 : this.dateDueYear;
 
 
                                                 DetailDto taxData = new DetailDto();
@@ -1814,7 +1814,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
             return result;
         }
 
-        public DetailDto SetValue(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType, string UDF = "", string subscriber = "")
+        public DetailDto SetValue(string type, string planName, string chgQty1Type, string chgQty1Used, string chgQty1Allowed, string chgQty1Billed, string chgAmt, string spInvRecordType, string UDF = "", string subscriber = "", string lineNumber  = "")
         {
             lock (this)
             {
@@ -1834,7 +1834,8 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                 detailDto.INFO_ONLY_IND = "N";
                 detailDto.SP_INV_RECORD_TYPE = spInvRecordType;
                 detailDto.UDF = UDF;
-                detailDto.SUBSCRIBER = subscriber;
+                detailDto.SP_NAME = subscriber;
+                detailDto.SUBSCRIBER = lineNumber.Replace("-", string.Empty);
 
 
                 this.lineTotal += System.Convert.ToDecimal(detailDto.CHG_AMT);
