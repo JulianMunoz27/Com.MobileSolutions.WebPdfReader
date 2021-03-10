@@ -414,7 +414,8 @@ namespace Com.MobileSolutions.Application.Helpers
                 var begMonth = Convert.ToInt32(accountMonthly[4].ToString().Split('-')[0].Split('/')[0]);
                 var endMonth = Convert.ToInt32(accountMonthly[4].ToString().Split('-')[1].Split('/')[0]);
 
-                var begYear = begMonth >= 1 && begMonth <= dateDueMonth ? dateDueYear : dateDueYear - 1;
+                var begYear = Convert.ToInt32(begMonth) >= 6 && Convert.ToInt32(endMonth) <= 6 ? dateDueYear - 1 : dateDueYear;  //var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                //var begYear = begMonth >= 1 && begMonth <= dateDueMonth ? dateDueYear : dateDueYear - 1;
                 var endYear = endMonth >= 1 && endMonth < dateDueMonth ? dateDueYear + 1 : dateDueYear;
 
                 taxData.UNIQ_ID = Constants.MRC;
