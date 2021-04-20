@@ -223,15 +223,16 @@ namespace Com.MobileSolutions.Application.Helpers
                                         else
                                         {
                                             var fileName = Path.GetFileName(pathValues.Path);
-                                            System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                                            //System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
                                             logger.Error("File index extraction failed");
+                                            //throw new InvalidOperationException($"Error in {fileName} index extraction");
                                         }
                                     }
                                 }
                                 else
                                 {
                                     var fileName = Path.GetFileName(pathValues.Path);
-                                    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                                    //System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
                                     logger.Error("File index extraction failed");
                                     errorCount++;
                                     buggedStrings.Add(splittedPage[line]);
@@ -414,7 +415,7 @@ namespace Com.MobileSolutions.Application.Helpers
                 var begMonth = Convert.ToInt32(accountMonthly[4].ToString().Split('-')[0].Split('/')[0]);
                 var endMonth = Convert.ToInt32(accountMonthly[4].ToString().Split('-')[1].Split('/')[0]);
 
-                var begYear = Convert.ToInt32(begMonth) >= 6 && Convert.ToInt32(endMonth) <= 6 ? dateDueYear - 1 : dateDueYear;  //var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                var begYear = dateDueYear;  //var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
                 //var begYear = begMonth >= 1 && begMonth <= dateDueMonth ? dateDueYear : dateDueYear - 1;
                 var endYear = endMonth >= 1 && endMonth < dateDueMonth ? dateDueYear + 1 : dateDueYear;
 

@@ -87,6 +87,9 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string Overage = "Overage";
         public static string OverageDetails = "|Overage Details";
         public static string OverageDetailsContinued = "|Overage Details, continued";
+        public static string ErrorMessage1 = "Invalid/Unknown/Unsupported format";
+        public static string ErrorMessage2 = "The index can not be less then zero or greater then Count. (Parameter 'index')";
+        public static string ErrorMessage3 = "Index was outside the bounds of the array.";
 
         //*******************************************************************************************************************
         //*********************************************** Regex *************************************************************

@@ -492,7 +492,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                         }
 
 
-                                        var begYear = Convert.ToInt32(voiceGroup[3].ToString()) >= 6 && Convert.ToInt32(voiceGroup[5].ToString()) <= 6 ? this.dateDueYear - 1 : this.dateDueYear;
+                                        var begYear = this.dateDueYear;
 
                                         var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[3].ToString()), Convert.ToInt32(voiceGroup[5].ToString()), this.dateDueMonth, this.dateDueYear);
 
@@ -1413,7 +1413,7 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                                 var begMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[0].Split('/')[0]);
                                                 var endMonth = Convert.ToInt32(accountMonthly[3].ToString().Split('-')[1].Split('/')[0]);
 
-                                                var begYear = Convert.ToInt32(begMonth) >= 6 && Convert.ToInt32(endMonth) <= 6 ? this.dateDueYear - 1 : this.dateDueYear;  //var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
+                                                var begYear = this.dateDueYear;  //var begYear = begMonth >= 1 && begMonth <= this.dateDueMonth ? this.dateDueYear : this.dateDueYear - 1;
                                                 var endYear = endMonth >= 1 && endMonth < this.dateDueMonth ? this.dateDueYear + 1 : this.dateDueYear;
 
 

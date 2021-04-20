@@ -45,15 +45,12 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
         [HttpPost]
         public void Post(PathValues pathValues)
         {
+            document = new PdfDocument();
             try
             {
                 logger.Trace($"start processing file:{pathValues.Path} at {DateTime.Now.ToString("yyyy/MM/dd-hh:mm:ss")}");
                 var fileName = Path.GetFileName(pathValues.Path);
 
-                //var headerRegex = new Regex(Constants.NamingConventionRegex).Match(fileName);
-                //if (headerRegex.Success)
-                //{
-                document = new PdfDocument();
                 helper = new ApplicationHelper();
                 verizonReader = new VerizonReader(document, pathValues.Path);
                 FileDto file = new FileDto();
@@ -69,27 +66,21 @@ namespace Com.MobileSolutions.WebPdfReader.Controllers
                 }
 
                 verizonReader.PlainTextConstructor(file, header, details, pathValues.Path, pathValues.OutputPath, pathValues.ProcessedFilesPath, pathValues.FailedFiles);
-                //}
-                //else
-                //{
-                //    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\BadFile\{fileName}");
-                //    logger.Error($"the {fileName} file doesn't achieve with the naming convention");
-                //}
-
                 logger.Trace($"finished processing file:{pathValues.Path} at {DateTime.Now.ToString("yyyy/MM/dd-hh:mm:ss")}");
             }
             catch (Exception ex)
             {
+                document.Close();
                 var fileName = Path.GetFileName(pathValues.Path);
 
-                if (ex.Message == "Invalid/Unknown/Unsupported format" || ex.Message == "The index can not be less then zero or greater then Count. (Parameter 'index')")
+                if (ex.Message == Constants.ErrorMessage1 || ex.Message == Constants.ErrorMessage2 || ex.Message == Constants.ErrorMessage3)
                 {
-                    System.IO.File.Move(pathValues.Path, $@"{pathValues.CorruptedFiles}\{fileName}");
+                    System.IO.File.Move(pathValues.Path, $@"{pathValues.CorruptedFiles}\{fileName}", true);
                     logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
                 }
                 else
                 {
-                    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}");
+                    System.IO.File.Move(pathValues.Path, $@"{pathValues.FailedFiles}\{fileName}", true);
                     logger.Error($"{ex.Message} in file {pathValues.Path} \\n\\n {ex.StackTrace}");
                 }
             }
