@@ -136,7 +136,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string EquipmentChargesRegex3 = @"([^\|]*\|)?([^\|]*\|\(one-time charge\))\|(\-?([0-9]*,)?([0-9]*)?\.[0-9]*)$";
         public static string MonthlyChargesRegex = @"(\|)?(.+)\|([0-9]{2})\/([0-9]{2})\s\-\s([0-9]{2})\/([0-9]{2})\|(\-?[0-9]*(\.[0-9]*))$";
         public static string DevicePaymentChargeRegex = @"([^\|]+\|)?(Device Payment Buyout Charge \(\d{1,3} - \d{1,3}\) Agreement \d*)\|(\-?([0-9]+,)*[0-9]*(\.[0-9]*))$";
-        public static string VoiceRegex = @"([^\|][^\|]+)\|(\-?[0-9]*\.[0-9]{1,2})";
+        public static string VoiceRegex = @"([^\|][^\|]+)\|(\-?[0-9]*\,?[0-9]*\.[0-9]{1,2})";
         public static string BroadbandRegex = @"^\|(([^\|]+) (\d{1,2}\/\d{1,2}\/\d{1,2}))\|(-?\$?(\d|\,|\.)*)$";
         public static string LicenseRegex = @"\|?([^\|]+ License(s)? @\s\-?\$?([0-9]*,)?[0-9]*\.[0-9]*\son\s(\d{1,2}\/\d{1,2}\/\d{2}))\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)$";
         public static string DetailForRegex = @"^Detail\sfor\s([^:]+):\s(\d{3}\-\d{3}\-\d{4})$";
@@ -152,7 +152,7 @@ namespace Com.MobileSolutions.Application.Dictionary
         public static string InternationDataRegex = @"([^\|]*)\|?(gigabytes|megabytes|kilobytes)( unlimited)?((\||\s)(([0-9]+,){0,2}[0-9]+\.?[0-9]*|\-\-))?\|(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(([0-9]+,)?[0-9]*\.?[0-9]*|\-\-)(\||\s)(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationDataSpecialCaseRegex = @"\|?([^\|]+ - (\d+) at \$ (\d+)\/(([0-9]+,)?[0-9]*\.?[0-9]*) (GB|MB|KB) (\d{1,2}\/\d{1,2} - \d{1,2}\/\d{1,2}))\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
         public static string InternationalMinutesRegex = @"([^\|]*)\|?(minutes|calls)( unlimited)?(\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-))?\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(([0-9]+,)*[0-9]*\.?[0-9]*|\-\-)\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*|\-\-)$";
-        public static string UsageVoiceRegex = @"([^\|]+)\|(minutes|calls)( unlimited)?(\|[0-9]*|\|--)?\|([0-9]*)\|([0-9]*|--)\|(\-?\$?[0-9]*\.[0-9]*|\-\-)$";
+        public static string UsageVoiceRegex = @"([^\|]+)\|(minutes|calls)( unlimited)?(\|[0-9]*|\|--)?\|([0-9,]*)\|([0-9,]*|--)\|(\-?\$?[0-9]*\,?[0-9]*\.[0-9]*|\-\-)$";
         public static string HeaderRegex = @"Bill Date\|([aA-zZ]* [0-9]{2}, [0-9]{4})";
         public static string NamingConventionRegex = @"[0-9]*_[^_]*_([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{2}-[0-9]{2}-[0-9]{4})_[0-9]+\.pdf";
         public static string AccountChargesCreditsTitle = @"Account Charges and Credits\|(\-?\$?([0-9]*,)?[0-9]*\.[0-9]*)$";

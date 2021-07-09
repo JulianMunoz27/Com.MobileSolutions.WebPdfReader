@@ -491,8 +491,11 @@ namespace Com.MobileSolutions.VerizonWirelessReader
                                             isFirst = false;
                                         }
 
+                                        var begMonth = Convert.ToInt32(voiceGroup[3].ToString());
+                                        var endMonth = Convert.ToInt32(voiceGroup[5].ToString());
 
-                                        var begYear = this.dateDueYear;
+
+                                        var begYear = begMonth > endMonth && begMonth - endMonth > 6 ? this.dateDueYear - 1 : this.dateDueYear;
 
                                         var endYear = Utils.GetYear(Convert.ToInt32(voiceGroup[3].ToString()), Convert.ToInt32(voiceGroup[5].ToString()), this.dateDueMonth, this.dateDueYear);
 
